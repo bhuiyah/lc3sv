@@ -21,6 +21,11 @@
 
 
 module CPU(
+    input cs;
+    input we;
+    input clk;
+    input [15:0] address;
+    inout [15:0] bus;
 
     );
 endmodule
