@@ -20,12 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module CPU(
+module CPU(clk, cs, we, address, bus);
+    input clk;
     input cs;
     input we;
-    input clk;
-    input [15:0] address;
-    inout [15:0] bus;
-
-    );
+    output [15:0] address;
+    inout [31:0] bus;
+    
 endmodule

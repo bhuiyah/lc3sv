@@ -24,10 +24,10 @@ module LC3(input CLK);
 
 wire cs, we;
 wire [15:0] address;
-wire [15:0] bus_contents;
+wire [31:0] bus_contents;
 wire slow_clk;
 
-Memory mem(.cs(cs), .we(we), .clk(clk), .address(address), .bus(bus_contents));
-littlecomputer3 CPU(.clk(clk), .cs(cs), .we(we), .address(address), .bus(bus_contents));
+memory mem(.cs(cs), .we(we), .clk(clk), .address(address), .bus(bus_contents));
+CPU littlecomputer3(.clk(clk), .cs(cs), .we(we), .address(address), .bus(bus_contents));
 
 endmodule
