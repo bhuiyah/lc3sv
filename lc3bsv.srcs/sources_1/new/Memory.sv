@@ -20,17 +20,17 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module memory(cs, we, clk, address, bus);
+module memory(cs, we, clk, address, memory_bus);
     input cs;
     input we;
     input clk;
     input [16:0] address;
-    inout [31:0] bus;
+    inout [31:0] memory_bus;
 
     reg [31:0] data_out;
     reg [15:0] DRAM [16'h8000][2];
 
-    assign bus = ((cs == 0) || (we == 1)) ? 32'bZ : data_out;
+    assign memory_bus = ((cs == 0) || (we == 1)) ? 32'bZ : data_out;
 
     initial begin
         //$readmemh(); //will add with instructions, vectors, etc.
@@ -39,8 +39,8 @@ module memory(cs, we, clk, address, bus);
     always @(negedge clk) begin
         //write to memory
         if ((cs == 1) && (we == 1)) begin 
-            DRAM[address][0] <= bus[31:16];
-            DRAM[address][1] <= bus[15:0];
+            DRAM[address][0] <= memory_bus[31:16];
+            DRAM[address][1] <= memory_bus[15:0];
         end
         //read from memory
         data_out <= {DRAM[address][0], DRAM[address][1]};

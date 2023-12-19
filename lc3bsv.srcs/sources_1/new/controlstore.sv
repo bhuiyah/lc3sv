@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 12/14/2023 06:46:08 PM
+// Create Date: 12/19/2023 07:30:52 PM
 // Design Name: 
-// Module Name: LC3
+// Module Name: controlstore
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,14 +20,17 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module LC3(input CLK);
+module controlstore(
+        input [15:0] state_number,
+        output [34:0] control_signals
+    );
 
-wire cs, we;
-wire [15:0] address;
-wire [31:0] memory_bus;
-wire slow_clk;
+    reg [34:0] control_store [63:0];
 
-memory mem(.cs(cs), .we(we), .clk(clk), .address(address), .memory_bus(memory_bus));
-CPU littlecomputer3(.clk(clk), .cs(cs), .we(we), .address(address), .memory_bus(memory_bus));
+    initial begin
+        readmemh("ucode.mem", control_store);
+    end
+
+    assign control_signals = control_store[state_number];
 
 endmodule
