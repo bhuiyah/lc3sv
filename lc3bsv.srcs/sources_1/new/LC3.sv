@@ -20,9 +20,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module LC3(input CLK);
+module LC3(clk);
 
-wire cs, we;
+input clk;
+
+wire cs;
+wire [1:0] we;
 wire [15:0] address;
 wire [31:0] memory_bus;
 wire [34:0] control_signals;
@@ -31,9 +34,12 @@ wire [3:0] opcode;
 wire ir11;
 wire ben;
 wire slow_clk;
+wire  [15:0] state_number;
+wire  [15:0] next_state_number;
+wire rw;
 
-memory mem(.cs(cs), .we(we), .clk(clk), .address(address), .memory_bus(memory_bus));
-datapath lc3(.clk(clk), .cs(cs), .we(we), .address(address), .memory_bus(memory_bus), .control_signals(control_signals), .r(r), .opcode(opcode), .ir11(ir11), .ben(ben));
+memory mem(.cs(cs), .we(we), .clk(clk), .rw(rw), .address(address), .memory_bus(memory_bus), .r(r));
+datapath lc3(.clk(clk), .cs(cs), .we(we), .address(address), .memory_bus(memory_bus), .control_signals(control_signals), .opcode(opcode), .ir11(ir11), .ben(ben), .rw(rw));
 control cont(.clk(clk), .r(r), .opcode(opcode), .ir11(ir11), .ben(ben), .state_number(state_number), .next_state_number(next_state_number), .control_signals(control_signals));
 
 endmodule

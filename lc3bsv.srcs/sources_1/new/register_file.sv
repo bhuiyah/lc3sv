@@ -45,7 +45,7 @@ module register_file(clk, reg_write, DR, SR1, SR2, Reg_In, ReadReg1, ReadReg2);
         ReadReg2 = 16'h0000;
     end
 
-    always @(posedge clk) begin
+    always_ff @(posedge clk) begin
         if(reg_write == 1) begin
             reg_file[DR] <= Reg_In;
         end

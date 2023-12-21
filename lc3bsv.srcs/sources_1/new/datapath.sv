@@ -49,52 +49,55 @@ enum cs_bits {
     control_store_bits
 } cs_bits;
 
-module datapath(clk, cs, we, address, memory_bus, control_signals, r, opcode, ir11, ben);
+module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw);
     input clk;
     input [15:0] address;
     input [34:0] control_signals;
 
     inout [31:0] memory_bus;
 
-    output reg cs, we;
-    output reg r;
+    output cs;
+    output [1:0] we;
     output [3:0] opcode;
     output ir11;
     output ben;
+    output rw;
 
-    //control signals
-    wire ldreg = control_signals[ld_reg_idx];
-    wire ldmar = control_signals[ld_mar_idx];
-    wire ldmio = control_signals[mio_en_idx];
-    wire ldmdr = control_signals[ld_mdr_idx];
-    wire ldpc = control_signals[ld_pc_idx];
-    wire ldcc = control_signals[ld_cc_idx];
-    wire ldben = control_signals[ld_ben_idx];
-    wire ldir = control_signals[ld_ir_idx];
-    wire gatepc = control_signals[gate_pc_idx];
-    wire gatemdr = control_signals[gate_mdr_idx];
-    wire gatealu = control_signals[gate_alu_idx];
-    wire gatemarmux = control_signals[gate_marmux_idx];
-    wire gateshf = control_signals[gate_shf_idx];
-    wire [1:0] pcmux = control_signals[pcmux1_idx:pcmux0_idx];
-    wire [1:0] addr2mux = control_signals[addr2mux1_idx:addr2mux0_idx];
-    wire [1:0] aluk = control_signals[aluk1_idx:aluk0_idx];
-    wire lshf1 = control_signals[lshf1_idx];
-    wire [1:0] drmux = control_signals[drmux_idx];
-    wire [1:0] sr1mux = control_signals[sr1mux_idx];
-    wire [1:0] addr1mux = control_signals[addr1mux_idx];
-    wire [1:0] marmux = control_signals[marmux_idx];
-    wire lshf1 = control_signals[lshf1_idx];
-    wire r_w = control_signals[r_w_idx];
-    wire data_size = control_signals[data_size_idx];
+    //control signals from control store
+    bit ldreg = control_signals[ld_reg_idx];
+    bit ldmar = control_signals[ld_mar_idx];
+    bit ldmdr = control_signals[ld_mdr_idx];
+    bit ldpc = control_signals[ld_pc_idx];
+    bit ldcc = control_signals[ld_cc_idx];
+    bit ldben = control_signals[ld_ben_idx];
+    bit ldir = control_signals[ld_ir_idx];
+    bit gatepc = control_signals[gate_pc_idx];
+    bit gatemdr = control_signals[gate_mdr_idx];
+    bit gatealu = control_signals[gate_alu_idx];
+    bit gatemarmux = control_signals[gate_marmux_idx];
+    bit gateshf = control_signals[gate_shf_idx];
+    bit [1:0] pcmux = control_signals[pcmux1_idx:pcmux0_idx];
+    bit [1:0] addr2mux = control_signals[addr2mux1_idx:addr2mux0_idx];
+    bit [1:0] aluk = control_signals[aluk1_idx:aluk0_idx];
+    bit lshf1 = control_signals[lshf1_idx];
+    bit [1:0] drmux = control_signals[drmux_idx];
+    bit [1:0] sr1mux = control_signals[sr1mux_idx];
+    bit [1:0] addr1mux = control_signals[addr1mux_idx];
+    bit [1:0] marmux = control_signals[marmux_idx];
+    bit lshf1 = control_signals[lshf1_idx];
+    bit data_size = control_signals[data_size_idx];
+    bit mio_en = control_signals[mio_en_idx];
     
     reg [15:0] instruction;
 
-    wire sr1 = instruction[8:6];
+    wire sr1 = sr1mux ? instruction[8:6] : instruction[11:9];
     wire sr2 = instruction[2:0];
-    wire dr = instruction[11:9];
+    wire dr = drmux ? 3'b111 : instruction[11:9];
 
     assign opcode = instruction[15:12];
+    assign cs = mio_en;
+    assign we = we_out;
+    assign rw = control_signals[r_w_idx];
 
     wire [31:0] readreg1, readreg2;
     register_file reg_file(.clk(clk), .reg_write(ldreg), .DR(dr), .SR1(sr1), .SR2(sr2), .Reg_In(reg_input), .ReadReg1(readreg1), .ReadReg2(readreg2));
@@ -108,7 +111,7 @@ module bus(clk, alu_out, shf_out, mdr_out, pc_out, marmux_out, gatealu, gateshf,
     input [15:0] mdr_out;
     input [15:0] pc_out;
     input [15:0] marmux_out;
-    input gatealu, gateshf, gatemdr, gatepc, gatemarmux;
+    input bit gatealu, gateshf, gatemdr, gatepc, gatemarmux;
     output reg [31:0] bus_contents;
 
     always_ff @(posedge clk) begin
@@ -137,7 +140,7 @@ module alu(clk, A, B, aluk, alu_out);
     input clk;
     input [15:0] A;
     input [15:0] B;
-    input [1:0] aluk;
+    input bit [1:0] aluk;
     output reg [15:0] alu_out;
 
     always_ff @(posedge clk) begin
@@ -193,7 +196,7 @@ endmodule
 module sr2_mux(clk, sr2muxsignal, readreg2, imm5, sr2_out);
     import packaged_functions::*;
     input clk;
-    input sr2muxsignal;
+    input bit sr2muxsignal;
     input [15:0] readreg2;
     input [4:0] imm5;
     output reg [15:0] sr2_out;
@@ -204,26 +207,26 @@ module sr2_mux(clk, sr2muxsignal, readreg2, imm5, sr2_out);
 
 endmodule
 
-module addr1_mux(clk, addr1muxsignal, pc, readreg1, addr1_out);
+module addr1_mux(clk, addr1mux, pc, readreg1, addr1_out);
     input clk;
-    input addr1muxsignal;
+    input addr1mux;
     input [15:0] pc;
     input [15:0] readreg1;
     output reg [15:0] addr1_out;
 
     always_ff @(posedge clk) begin
-        addr1_out <= addr1muxsignal ? readreg1 : pc;
+        addr1_out <= addr1mux ? readreg1 : pc;
     end
 endmodule
 
-module addr2_mux(clk, addr2muxsignal, ir, addr2_out);
+module addr2_mux(clk, addr2mux, ir, addr2_out);
     input clk;
-    input [1:0] addr2muxsignal;
+    input [1:0] addr2mux;
     input [15:0] ir;
     output reg [15:0] addr2_out;
 
     always_ff @(posedge clk) begin
-        case(addr2muxsignal)
+        case(addr2mux)
             2'b00: begin
                 addr2_out <= 16'h0000;
             end
@@ -240,14 +243,14 @@ module addr2_mux(clk, addr2muxsignal, ir, addr2_out);
     end
 endmodule
 
-module lshf1(clk, lshf1signal, in, lshf1_out);
+module lshf1(clk, lshf1, in, lshf1_out);
     input clk;
-    input lshf1signal;
+    input lshf1;
     input [15:0] in;
     output reg [15:0] lshf1_out;
 
     always_ff @(posedge clk) begin
-        lshf1_out <= lshf1signal ? (in << 1) : in;
+        lshf1_out <= lshf1 ? (in << 1) : in;
     end
 endmodule
 
@@ -363,6 +366,101 @@ module pc_reg(clk, ldpc, pcmux_out, pc);
     always_ff @(posedge clk) begin
         if(ldpc) begin
             pc <= pcmux_out;
+        end
+    end
+endmodule
+
+module mar_reg(clk, ldmar, bus, mar);
+    input clk;
+    input ldmar;
+    input [31:0] bus;
+    output reg [15:0] mar;
+
+    always_ff @(posedge clk) begin
+        if(ldmar) begin
+            mar <= bus[15:0];
+        end
+    end
+endmodule
+
+module mdr_reg(clk, ldmdr, mioen_out, mdr);
+    input clk;
+    input ldmdr;
+    input [15:0] mioen_out;
+    output reg [15:0] mdr;
+
+    always_ff @(posedge clk) begin
+        if(ldmdr) begin
+            mdr <= mioen_out;
+        end
+    end
+endmodule
+
+//////////memory management//////////
+module mdr_in_logic(clk, bus, data_size, mdr_in_mioen_mux);
+    input clk;
+    input [31:0] bus;
+    input data_size;
+    output reg [15:0] mdr_in_mioen_mux;
+
+    always_ff @(posedge clk) begin
+        if(data_size) begin
+            mdr_in_mioen_mux <= bus[15:0];
+        end
+        else begin
+            mdr_in_mioen_mux <= {bus[7:0], bus[7:0]};
+        end
+    end
+endmodule
+
+module mio_en_mux(clk, mio_en, mdr_in_mioen_mux, mdr_val_from_mem, mioen_out);
+    input clk;
+    input mio_en;
+    input [15:0] mdr_in_mioen_mux;
+    input [15:0] mdr_val_from_mem;
+    output reg [15:0] mioen_out;
+
+    always_ff @(posedge clk) begin
+        if(mio_en) begin
+            mioen_out <= mdr_val_from_mem;
+        end
+        else begin
+            mioen_out <= mdr_in_mioen_mux;
+        end
+    end
+endmodule
+
+module mdr_out_logic(clk, mdr, data_size, mar0, mdr_out);
+    input clk;
+    input [15:0] mdr;
+    input data_size;
+    input mar0;
+    output reg [15:0] mdr_out;
+
+    always_ff @(posedge clk) begin
+        if(data_size) begin
+            mdr_out <= mdr;
+        end
+        else begin
+            mdr_out <= mar0 ? mdr[15:8] : mdr[7:0];
+        end
+    end
+endmodule
+
+module we_logic(clk, rw, mar0, data_size, we_out);
+    input clk;
+    input rw;
+    input mar0;
+    input data_size;
+    output reg [1:0] we_out; //we1 for high byte, we0 for low byte
+
+    always_ff @(posedge clk) begin
+        if(rw) begin
+            we[0] <= (!mar0 && !data_size) || (data_size && !mar0);
+            we[1] <= (mar0 && !data_size) || (data_size && !mar0);
+        end
+        else begin
+            we <= 2'b00;
         end
     end
 endmodule
