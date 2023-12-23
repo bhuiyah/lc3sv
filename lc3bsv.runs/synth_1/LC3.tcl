@@ -70,8 +70,6 @@ proc create_report { reportName command } {
   }
 }
 OPTRACE "synth_1" START { ROLLUP_AUTO }
-set_param synth.elaboration.rodinMoreOptions {rt::set_parameter var_size_limit 1048576}
-set_param chipscope.maxJobs 1
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7k70tfbv676-1
 
@@ -89,7 +87,6 @@ OPTRACE "Adding files" START { }
 read_mem /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/ucode3.mem
 read_verilog -library xil_defaultlib -sv {
   /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/control.sv
-  /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/packaged_functions.sv
   /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv
   /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/memory.sv
   /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/register_file.sv

@@ -49,20 +49,40 @@ typedef enum bit[5:0] {
     control_store_bits
 } cs_bits;
 
+package packaged_functions;
+    function automatic [15:0] sext(input [15:0] A, input [4:0] num_bits); 
+
+        reg sign_bit;
+        reg [15:0] mask;
+
+        sign_bit = A[num_bits - 1] && 1;
+        if(sign_bit) begin
+            mask = {16'hFFFF << num_bits};
+            sext = A | mask;
+        end
+        else begin
+            sext = A;
+        end
+        return sext;
+    endfunction
+endpackage
+
+import packaged_functions::*;
+
 module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r);
     input clk;
-    input [15:0] address;
     input [34:0] control_signals;
+    input r;
 
     inout [15:0] memory_bus;
 
     output cs;
     output [1:0] we;
+    output [15:0] address;
     output [3:0] opcode;
     output ir11;
     output ben;
     output rw;
-    output r;
 
     //control signals from control store
     bit ldreg = control_signals[ld_reg_idx];
@@ -88,8 +108,7 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     bit data_size = control_signals[data_size_idx];
     bit mio_en = control_signals[mio_en_idx];
     
-    reg [15:0] instruction;
-
+    wire [15:0] instruction;
     wire [2:0] sr1 = sr1mux ? instruction[8:6] : instruction[11:9];
     wire [2:0] sr2 = instruction[2:0];
     wire [2:0] dr = drmux ? 3'b111 : instruction[11:9];
@@ -111,6 +130,8 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     assign rw = control_signals[r_w_idx];
     assign ir11 = instruction[11];
     assign mdr_val_from_mem = (mio_en && !rw && r) ? memory_bus : 16'h0000;
+    assign A = readreg1;
+    assign address = mar;
 
     //wiring the datapath
     register_file reg_file(.clk(clk), .reg_write(ldreg), .DR(dr), .SR1(sr1), .SR2(sr2), .Reg_In(bus_contents), .ReadReg1(readreg1), .ReadReg2(readreg2));

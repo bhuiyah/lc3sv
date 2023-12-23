@@ -30,10 +30,12 @@ module memory(cs, we, clk, rw, address, memory_bus, r);
     output r;
 
     reg [15:0] data_out;
-    reg [7:0] DRAM [16'h08000][2];
     reg [3:0] cycle_count;
     reg [14:0] acc_addr;
-
+    
+    reg [7:0] DRAM_high [16'h08000];
+    reg [7:0] DRAM_low [16'h08000];
+    
     assign memory_bus = ((cs == 0) || (we == 1)) ? 16'bZ : data_out;
     assign r = (cycle_count == 5);
     assign acc_addr = address[15:1];
@@ -43,19 +45,19 @@ module memory(cs, we, clk, rw, address, memory_bus, r);
         cycle_count = 0;
     end
 
-    always_ff @(negedge clk) begin
+    always@(negedge clk) begin
         //write to memory
         if(cs) begin //cs = mio_en
             if(cycle_count == 5) begin //5 cycles to read or write to DRAM
                 if(rw) begin //write
                     if(we[0])
-                        DRAM[acc_addr][0] <= memory_bus[7:0];
+                        DRAM_low[acc_addr] <= memory_bus[7:0];
 
                     if(we[1])
-                        DRAM[acc_addr][1] <= memory_bus[15:8];
+                        DRAM_high[acc_addr] <= memory_bus[15:8];
                 end
                 else //read
-                    data_out <= {DRAM[acc_addr][0], DRAM[acc_addr][1]};
+                    data_out <= {DRAM_high[acc_addr], DRAM_low[acc_addr]};
                 cycle_count <= 0; //reset cycle count after accessing DRAM
             end else
                 cycle_count <= cycle_count + 1;

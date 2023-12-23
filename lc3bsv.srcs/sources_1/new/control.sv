@@ -28,7 +28,7 @@ module control(clk, r, opcode, ir11, ben, state_number, next_state_number, contr
     input ben;
     input [5:0] state_number;
     output reg [5:0] next_state_number;
-    output reg [34:0] control_signals;
+    output bit [34:0] control_signals;
 
     bit [5:0] j;
     bit [1:0] cond;
