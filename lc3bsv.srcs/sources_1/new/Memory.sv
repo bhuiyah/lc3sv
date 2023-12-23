@@ -30,7 +30,7 @@ module memory(cs, we, clk, rw, address, memory_bus, r);
     output r;
 
     reg [31:0] data_out;
-    reg [15:0] DRAM [16'h8000][2];
+    reg [15:0] DRAM [16'h08000][2];
     reg cycle_count;
 
     assign memory_bus = ((cs == 0) || (we == 1)) ? 32'bZ : data_out;

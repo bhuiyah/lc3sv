@@ -1,0 +1,379 @@
+#-----------------------------------------------------------
+# Vivado v2023.1 (64-bit)
+# SW Build 3865809 on Sun May  7 15:04:56 MDT 2023
+# IP Build 3864474 on Sun May  7 20:36:21 MDT 2023
+# SharedData Build 3865790 on Sun May 07 13:33:03 MDT 2023
+# Start of session at: Sat Dec 23 00:13:15 2023
+# Process ID: 1711
+# Current directory: /home/user/lc3bsv/lc3bsv.runs/synth_1
+# Command line: vivado -log LC3.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source LC3.tcl
+# Log file: /home/user/lc3bsv/lc3bsv.runs/synth_1/LC3.vds
+# Journal file: /home/user/lc3bsv/lc3bsv.runs/synth_1/vivado.jou
+# Running On: 7e1f5b4c3285, OS: Linux, CPU Frequency: , CPU Physical cores: 1, Host memory: 8232 MB
+#-----------------------------------------------------------
+source LC3.tcl -notrace
+create_project: Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2622.484 ; gain = 52.148 ; free physical = 2521 ; free virtual = 6474
+Command: read_checkpoint -auto_incremental -incremental /home/user/lc3bsv/lc3bsv.srcs/utils_1/imports/synth_1/LC3.dcp
+INFO: [Vivado 12-5825] Read reference checkpoint from /home/user/lc3bsv/lc3bsv.srcs/utils_1/imports/synth_1/LC3.dcp for incremental synthesis
+INFO: [Vivado 12-7989] Please ensure there are no constraint changes
+Command: synth_design -top LC3 -part xc7k70tfbv676-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7k70t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7k70t'
+INFO: [Designutils 20-5440] No compile time benefit to using incremental synthesis; A full resynthesis will be run
+INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 4 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 1740
+INFO: [Synth 8-11241] undeclared symbol 'reg_input', assumed default net type 'wire' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:119]
+---------------------------------------------------------------------------------
+Starting Synthesize : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 3045.875 ; gain = 387.793 ; free physical = 2196 ; free virtual = 5927
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'LC3' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/LC3.sv:23]
+INFO: [Synth 8-6157] synthesizing module 'memory' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/memory.sv:23]
+INFO: [Synth 8-6155] done synthesizing module 'memory' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/memory.sv:23]
+INFO: [Synth 8-6157] synthesizing module 'datapath' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:52]
+INFO: [Synth 8-6157] synthesizing module 'register_file' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/register_file.sv:23]
+INFO: [Synth 8-6155] done synthesizing module 'register_file' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/register_file.sv:23]
+WARNING: [Synth 8-689] width (32) of port connection 'ReadReg1' does not match port width (16) of module 'register_file' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:119]
+WARNING: [Synth 8-689] width (32) of port connection 'ReadReg2' does not match port width (16) of module 'register_file' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:119]
+INFO: [Synth 8-6157] synthesizing module 'bus' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:147]
+INFO: [Synth 8-6155] done synthesizing module 'bus' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:147]
+INFO: [Synth 8-6157] synthesizing module 'sr2_mux' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:236]
+INFO: [Synth 8-6155] done synthesizing module 'sr2_mux' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:236]
+WARNING: [Synth 8-689] width (32) of port connection 'readreg2' does not match port width (16) of module 'sr2_mux' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:121]
+INFO: [Synth 8-6157] synthesizing module 'alu' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:179]
+INFO: [Synth 8-6155] done synthesizing module 'alu' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:179]
+INFO: [Synth 8-6157] synthesizing module 'shf' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:204]
+INFO: [Synth 8-6155] done synthesizing module 'shf' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:204]
+INFO: [Synth 8-6157] synthesizing module 'addr1_mux' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:250]
+INFO: [Synth 8-6155] done synthesizing module 'addr1_mux' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:250]
+WARNING: [Synth 8-689] width (32) of port connection 'readreg1' does not match port width (16) of module 'addr1_mux' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:124]
+WARNING: [Synth 8-689] width (1) of port connection 'addr1_out' does not match port width (16) of module 'addr1_mux' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:124]
+INFO: [Synth 8-6157] synthesizing module 'addr2_mux' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:262]
+INFO: [Synth 8-6155] done synthesizing module 'addr2_mux' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:262]
+INFO: [Synth 8-6157] synthesizing module 'lshf1mod' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:287]
+INFO: [Synth 8-6155] done synthesizing module 'lshf1mod' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:287]
+INFO: [Synth 8-6157] synthesizing module 'adder_for_marmux_or_pcmux' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:298]
+INFO: [Synth 8-6155] done synthesizing module 'adder_for_marmux_or_pcmux' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:298]
+INFO: [Synth 8-6157] synthesizing module 'mar_mux' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:310]
+INFO: [Synth 8-6155] done synthesizing module 'mar_mux' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:310]
+INFO: [Synth 8-6157] synthesizing module 'pc_mux' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:322]
+WARNING: [Synth 8-151] case item 2'b10 is unreachable [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:338]
+INFO: [Synth 8-226] default block is never used [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:331]
+INFO: [Synth 8-6155] done synthesizing module 'pc_mux' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:322]
+WARNING: [Synth 8-689] width (2) of port connection 'pcmux' does not match port width (1) of module 'pc_mux' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:129]
+INFO: [Synth 8-6157] synthesizing module 'ir_reg' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:349]
+INFO: [Synth 8-6155] done synthesizing module 'ir_reg' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:349]
+INFO: [Synth 8-6157] synthesizing module 'ben_reg' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:362]
+INFO: [Synth 8-6155] done synthesizing module 'ben_reg' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:362]
+INFO: [Synth 8-6157] synthesizing module 'cc_reg' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:384]
+INFO: [Synth 8-6155] done synthesizing module 'cc_reg' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:384]
+WARNING: [Synth 8-689] width (32) of port connection 'bus' does not match port width (16) of module 'cc_reg' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:134]
+INFO: [Synth 8-6157] synthesizing module 'pc_reg' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:401]
+INFO: [Synth 8-6155] done synthesizing module 'pc_reg' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:401]
+INFO: [Synth 8-6157] synthesizing module 'mar_reg' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:414]
+INFO: [Synth 8-6155] done synthesizing module 'mar_reg' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:414]
+INFO: [Synth 8-6157] synthesizing module 'mdr_reg' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:427]
+INFO: [Synth 8-6155] done synthesizing module 'mdr_reg' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:427]
+INFO: [Synth 8-6157] synthesizing module 'mdr_in_logic' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:441]
+INFO: [Synth 8-6155] done synthesizing module 'mdr_in_logic' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:441]
+INFO: [Synth 8-6157] synthesizing module 'mio_en_mux' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:457]
+INFO: [Synth 8-6155] done synthesizing module 'mio_en_mux' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:457]
+INFO: [Synth 8-6157] synthesizing module 'mdr_out_logic' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:474]
+INFO: [Synth 8-6155] done synthesizing module 'mdr_out_logic' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:474]
+INFO: [Synth 8-6157] synthesizing module 'we_logic' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:491]
+INFO: [Synth 8-6155] done synthesizing module 'we_logic' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:491]
+INFO: [Synth 8-6155] done synthesizing module 'datapath' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:52]
+INFO: [Synth 8-6157] synthesizing module 'control' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/control.sv:23]
+INFO: [Synth 8-3876] $readmem data file 'ucode3.mem' is read successfully [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/control.sv:40]
+INFO: [Synth 8-6155] done synthesizing module 'control' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/control.sv:23]
+WARNING: [Synth 8-689] width (16) of port connection 'state_number' does not match port width (6) of module 'control' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/LC3.sv:43]
+WARNING: [Synth 8-689] width (16) of port connection 'next_state_number' does not match port width (6) of module 'control' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/LC3.sv:43]
+INFO: [Synth 8-6155] done synthesizing module 'LC3' (0#1) [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/LC3.sv:23]
+WARNING: [Synth 8-6014] Unused sequential element cycle_count_reg was removed.  [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/memory.sv:37]
+WARNING: [Synth 8-3848] Net data_out in module/entity memory does not have driver. [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/memory.sv:32]
+WARNING: [Synth 8-3848] Net r in module/entity datapath does not have driver. [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:65]
+WARNING: [Synth 8-3848] Net A in module/entity datapath does not have driver. [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:99]
+WARNING: [Synth 8-3848] Net reg_input in module/entity datapath does not have driver. [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:119]
+WARNING: [Synth 8-6014] Unused sequential element ird_reg was removed.  [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/control.sv:46]
+WARNING: [Synth 8-6014] Unused sequential element cond_reg was removed.  [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/control.sv:47]
+WARNING: [Synth 8-6014] Unused sequential element j_reg was removed.  [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/control.sv:48]
+WARNING: [Synth 8-3848] Net address in module/entity LC3 does not have driver. [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/LC3.sv:29]
+WARNING: [Synth 8-3848] Net state_number in module/entity LC3 does not have driver. [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/LC3.sv:37]
+WARNING: [Synth 8-7129] Port clk in module mdr_out_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port clk in module mio_en_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port clk in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[31] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[30] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[29] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[28] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[27] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[26] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[25] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[24] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[23] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[22] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[21] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[20] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[19] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[18] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[17] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[16] in module mdr_in_logic is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[31] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[30] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[29] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[28] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[27] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[26] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[25] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[24] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[23] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[22] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[21] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[20] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[19] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[18] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[17] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[16] in module mar_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[15] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[14] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[13] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[12] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[8] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[7] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[6] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[5] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[4] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[3] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[2] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[1] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ir[0] in module ben_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[31] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[30] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[29] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[28] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[27] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[26] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[25] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[24] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[23] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[22] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[21] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[20] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[19] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[18] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[17] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[16] in module ir_reg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port clk in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[15] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[14] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[13] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[12] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[11] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[10] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[9] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[8] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[7] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[6] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[5] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[4] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[3] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[2] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[1] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port adder_out[0] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[31] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[30] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[29] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[28] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[27] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[26] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[25] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[24] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[23] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[22] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[21] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[20] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[19] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[18] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[17] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port bus[16] in module pc_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port clk in module mar_mux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port clk in module adder_for_marmux_or_pcmux is either unconnected or has no load
+WARNING: [Synth 8-7129] Port clk in module addr2_mux is either unconnected or has no load
+INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+---------------------------------------------------------------------------------
+Finished Synthesize : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 3147.488 ; gain = 489.406 ; free physical = 1611 ; free virtual = 5559
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 3147.637 ; gain = 489.555 ; free physical = 1608 ; free virtual = 5556
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7k70tfbv676-1
+---------------------------------------------------------------------------------
+INFO: [Device 21-403] Loading part xc7k70tfbv676-1
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 3155.793 ; gain = 497.711 ; free physical = 1608 ; free virtual = 5556
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:11 ; elapsed = 00:00:11 . Memory (MB): peak = 3162.039 ; gain = 503.957 ; free physical = 1599 ; free virtual = 5546
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input   16 Bit       Adders := 3     
++---XORs : 
+	   2 Input     16 Bit         XORs := 1     
++---Registers : 
+	               35 Bit    Registers := 1     
+	               16 Bit    Registers := 8     
+	                6 Bit    Registers := 1     
+	                3 Bit    Registers := 1     
+	                2 Bit    Registers := 1     
+	                1 Bit    Registers := 1     
++---RAMs : 
+	              128 Bit	(8 X 16 bit)          RAMs := 1     
++---Muxes : 
+	  65 Input   35 Bit        Muxes := 1     
+	   2 Input   32 Bit        Muxes := 1     
+	   2 Input   16 Bit        Muxes := 10    
+	   4 Input   16 Bit        Muxes := 3     
+	   2 Input    8 Bit        Muxes := 1     
+	   4 Input    6 Bit        Muxes := 1     
+	   2 Input    3 Bit        Muxes := 2     
+	   2 Input    2 Bit        Muxes := 2     
+	   2 Input    1 Bit        Muxes := 3     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 240 (col length:80)
+BRAMs: 270 (col length: RAMB18 80 RAMB36 40)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
+WARNING: [Synth 8-3936] Found unconnected internal register 'lc3/mar_r/mar_reg' and it is trimmed from '16' to '1' bits. [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:422]
+WARNING: [Synth 8-3936] Found unconnected internal register 'lc3/ir_r/ir_reg' and it is trimmed from '16' to '12' bits. [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:357]
+WARNING: [Synth 8-3936] Found unconnected internal register 'lc3/reg_file/ReadReg1_reg' and it is trimmed from '16' to '1' bits. [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/register_file.sv:53]
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:16 ; elapsed = 00:00:19 . Memory (MB): peak = 3343.359 ; gain = 685.277 ; free physical = 1382 ; free virtual = 5334
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:16 ; elapsed = 00:00:19 . Memory (MB): peak = 3343.742 ; gain = 685.660 ; free physical = 1378 ; free virtual = 5330
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:17 ; elapsed = 00:00:19 . Memory (MB): peak = 3343.840 ; gain = 685.758 ; free physical = 1372 ; free virtual = 5323
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3343.914 ; gain = 685.832 ; free physical = 1370 ; free virtual = 5322
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3343.922 ; gain = 685.840 ; free physical = 1370 ; free virtual = 5322
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3343.953 ; gain = 685.871 ; free physical = 1370 ; free virtual = 5322
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3343.961 ; gain = 685.879 ; free physical = 1370 ; free virtual = 5322
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3343.973 ; gain = 685.891 ; free physical = 1370 ; free virtual = 5322
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3343.977 ; gain = 685.895 ; free physical = 1370 ; free virtual = 5322
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++-+-----+------+
+| |Cell |Count |
++-+-----+------+
++-+-----+------+
+
+Report Instance Areas: 
++------+---------+-------+------+
+|      |Instance |Module |Cells |
++------+---------+-------+------+
+|1     |top      |       |     0|
++------+---------+-------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3344.008 ; gain = 685.926 ; free physical = 1370 ; free virtual = 5321
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 193 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3344.027 ; gain = 685.945 ; free physical = 1370 ; free virtual = 5321
+Synthesis Optimization Complete : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3344.039 ; gain = 685.945 ; free physical = 1370 ; free virtual = 5321
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 3344.812 ; gain = 0.020 ; free physical = 1735 ; free virtual = 5693
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3437.988 ; gain = 0.000 ; free physical = 1639 ; free virtual = 5601
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Synth Design complete | Checksum: a0db3b01
+INFO: [Common 17-83] Releasing license: Synthesis
+68 Infos, 124 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:29 ; elapsed = 00:00:26 . Memory (MB): peak = 3438.070 ; gain = 790.758 ; free physical = 1638 ; free virtual = 5600
+INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 2022.331; main = 1614.469; forked = 558.723
+INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 7866.168; main = 3438.070; forked = 4522.285
+INFO: [Common 17-1381] The checkpoint '/home/user/lc3bsv/lc3bsv.runs/synth_1/LC3.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file LC3_utilization_synth.rpt -pb LC3_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Sat Dec 23 00:13:57 2023...

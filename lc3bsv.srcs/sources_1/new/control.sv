@@ -28,25 +28,25 @@ module control(clk, r, opcode, ir11, ben, state_number, next_state_number, contr
     input ben;
     input [5:0] state_number;
     output reg [5:0] next_state_number;
-    output [34:0] control_signals;
+    output reg [34:0] control_signals;
 
-    wire [5:0] j;
-    wire [1:0] cond;
-    wire ird; 
+    bit [5:0] j;
+    bit [1:0] cond;
+    bit ird; 
 
-    reg [34:0] control_store [63:0];
+    bit [34:0] control_store [63:0];
 
     initial begin
-        readmemh("ucode.mem", control_store);
+        $readmemh("ucode3.mem", control_store);
     end
 
-    assign control_signals = control_store[state_number];
-    assign ird = control_store[state_number][34];
-    assign cond = control_store[state_number][33:32];
-    assign j = control_store[state_number][31:26];
-
-    always_ff @(posedge clk) begin
+    always@(posedge clk) begin
         //microsequencer
+        control_signals = control_store[state_number];
+        ird = control_store[state_number][34];
+        cond = control_store[state_number][33:32];
+        j = control_store[state_number][31:26];
+        
         if(ird) begin
             next_state_number <= opcode;
         end
@@ -62,7 +62,7 @@ module control(clk, r, opcode, ir11, ben, state_number, next_state_number, contr
                     next_state_number <= ben ? (j | ben << 2) : j;
                 end
                 2'b11 : begin
-                    next_state_number <= ir11 ? (j | irll) : j;
+                    next_state_number <= ir11 ? (j | ir11) : j;
                 end
             endcase
         end

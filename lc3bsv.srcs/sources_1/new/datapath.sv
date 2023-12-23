@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-enum cs_bits {
+typedef enum bit[5:0] {
     ird_idx,
     cond1_idx, cond0_idx,
     j5_idx, j4_idx, j3_idx, j2_idx, j1_idx, j0_idx,
@@ -49,7 +49,7 @@ enum cs_bits {
     control_store_bits
 } cs_bits;
 
-module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw);
+module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r);
     input clk;
     input [15:0] address;
     input [34:0] control_signals;
@@ -62,6 +62,7 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     output ir11;
     output ben;
     output rw;
+    output r;
 
     //control signals from control store
     bit ldreg = control_signals[ld_reg_idx];
@@ -76,15 +77,14 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     bit gatealu = control_signals[gate_alu_idx];
     bit gatemarmux = control_signals[gate_marmux_idx];
     bit gateshf = control_signals[gate_shf_idx];
-    bit [1:0] pcmux = control_signals[pcmux1_idx:pcmux0_idx];
-    bit [1:0] addr2mux = control_signals[addr2mux1_idx:addr2mux0_idx];
-    bit [1:0] aluk = control_signals[aluk1_idx:aluk0_idx];
+    bit [1:0] pcmux = {control_signals[pcmux1_idx], control_signals[pcmux0_idx]};
+    bit [1:0] addr2mux = {control_signals[addr2mux1_idx], control_signals[addr2mux0_idx]};
+    bit [1:0] aluk = {control_signals[aluk1_idx], control_signals[aluk0_idx]};
     bit lshf1 = control_signals[lshf1_idx];
-    bit [1:0] drmux = control_signals[drmux_idx];
-    bit [1:0] sr1mux = control_signals[sr1mux_idx];
-    bit [1:0] addr1mux = control_signals[addr1mux_idx];
-    bit [1:0] marmux = control_signals[marmux_idx];
-    bit lshf1 = control_signals[lshf1_idx];
+    bit drmux = control_signals[drmux_idx];
+    bit sr1mux = control_signals[sr1mux_idx];
+    bit addr1mux = control_signals[addr1mux_idx];
+    bit marmux = control_signals[marmux_idx];
     bit data_size = control_signals[data_size_idx];
     bit mio_en = control_signals[mio_en_idx];
     
@@ -93,15 +93,55 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     wire sr1 = sr1mux ? instruction[8:6] : instruction[11:9];
     wire sr2 = instruction[2:0];
     wire dr = drmux ? 3'b111 : instruction[11:9];
+    wire [31:0] readreg1, readreg2;
+    wire [15:0] alu_out, shf_out, mdr_out, pc_out, marmux_out;
+    wire [31:0] bus_contents;
+    wire [15:0] A, B;
+    wire [15:0] pc, mar, mdr;
+    wire [2:0] cc;
+    wire addr1_out;
+    wire [15:0] addr2_out;
+    wire [15:0] lshf1_out;
+    wire [15:0] adder_out;
+    wire [15:0] mdr_in_mioen_mux;
+    wire [15:0] mioen_out;
+    wire [15:0] mdr_val_from_mem;
+    wire [1:0] we_out;
 
     assign opcode = instruction[15:12];
     assign cs = mio_en;
     assign we = we_out;
     assign rw = control_signals[r_w_idx];
+    assign ir11 = instruction[11];
+    assign mdr_val_from_mem = (mio_en && !rw && r) ? memory_bus : 16'h0000;
 
-    wire [31:0] readreg1, readreg2;
+    //wiring the datapath
     register_file reg_file(.clk(clk), .reg_write(ldreg), .DR(dr), .SR1(sr1), .SR2(sr2), .Reg_In(reg_input), .ReadReg1(readreg1), .ReadReg2(readreg2));
-    
+    bus b_u_s(.clk(clk), .alu_out(alu_out), .shf_out(shf_out), .mdr_out(mdr_out), .pc_out(pc_out), .marmux_out(marmux_out), .gatealu(gatealu), .gateshf(gateshf), .gatemdr(gatemdr), .gatepc(gatepc), .gatemarmux(gatemarmux), .bus_contents(bus_contents));
+    sr2_mux sr2_mux(.clk(clk), .sr2muxsignal(instruction[5]), .readreg2(readreg2), .imm5(instruction[4:0]), .sr2_out(B));
+    alu a_l_u(.clk(clk), .A(A), .B(B), .aluk(aluk), .alu_out(alu_out));
+    shf s_h_f(.clk(clk), .A(A), .ir5_4(instruction[5:4]), .ammt4(instruction[3:0]), .shf_out(shf_out));
+    addr1_mux addr1_mx(.clk(clk), .addr1mux(addr1mux), .pc(pc), .readreg1(readreg1), .addr1_out(addr1_out));
+    addr2_mux addr2_mx(.clk(clk), .addr2mux(addr2mux), .ir(instruction), .addr2_out(addr2_out));
+    lshf1mod lshf(.clk(clk), .lshf1(lshf1), .in(addr2_out), .lshf1_out(lshf1_out));
+    adder_for_marmux_or_pcmux adder(.clk(clk), .lshf1_in(lshf1_out), .addr1mux_in(addr1_out), .adder_out(adder_out));
+    mar_mux mar_mx(.clk(clk), .marmux(marmux), .adder_out(adder_out), .ir(instruction), .marmux_out(marmux_out));
+    pc_mux pc_mx(.clk(clk), .pcmux(pcmux), .adder_out(adder_out), .bus(bus_contents), .pc(pc), .pcmux_out(pc_out));
+
+    //loading registers
+    ir_reg ir_r(.clk(clk), .ld_ir(ldir), .bus(bus_contents), .ir(instruction));
+    ben_reg ben_r(.clk(clk), .ldben(ldben), .ir(instruction), .cc(cc), .ben(ben));
+    cc_reg cc_r(.clk(clk), .ldcc(ldcc), .bus(bus_contents), .cc(cc));
+    pc_reg pc_r(.clk(clk), .ldpc(ldpc), .pcmux_out(pc_out), .pc(pc));
+    mar_reg mar_r(.clk(clk), .ldmar(ldmar), .bus(bus_contents), .mar(mar));
+    mdr_reg mdr_r(.clk(clk), .ldmdr(ldmdr), .mioen_out(mioen_out), .mdr(mdr));
+
+    //memory management
+    mdr_in_logic mdr_in(.clk(clk), .bus(bus_contents), .data_size(data_size), .mdr_in_mioen_mux(mdr_in_mioen_mux));
+    mio_en_mux mio_en_mx(.clk(clk), .mio_en(mio_en), .mdr_in_mioen_mux(mdr_in_mioen_mux), .mdr_val_from_mem(mdr_val_from_mem), .mioen_out(mioen_out));
+    mdr_out_logic mdr_out_log(.clk(clk), .mdr(mdr), .data_size(data_size), .mar0(mar[0]), .mdr_out(mdr_out));
+    we_logic we_l(.clk(clk), .rw(rw), .mar0(mar[0]), .data_size(data_size), .we_out(we_out));
+
 endmodule
 
 module bus(clk, alu_out, shf_out, mdr_out, pc_out, marmux_out, gatealu, gateshf, gatemdr, gatepc, gatemarmux, bus_contents);
@@ -114,7 +154,7 @@ module bus(clk, alu_out, shf_out, mdr_out, pc_out, marmux_out, gatealu, gateshf,
     input bit gatealu, gateshf, gatemdr, gatepc, gatemarmux;
     output reg [31:0] bus_contents;
 
-    always_ff @(posedge clk) begin
+    always@(posedge clk) begin
         if(gatealu) begin
             bus_contents <= alu_out;
         end
@@ -143,19 +183,19 @@ module alu(clk, A, B, aluk, alu_out);
     input bit [1:0] aluk;
     output reg [15:0] alu_out;
 
-    always_ff @(posedge clk) begin
+    always_comb begin
         case(aluk)
             2'b00: begin
-                alu_out <= A & B;
+                alu_out = A & B;
             end
             2'b01: begin
-                alu_out <= A + B;
+                alu_out = A + B;
             end
             2'b10: begin
-                alu_out <= A ^ B;
+                alu_out = A ^ B;
             end
             2'b11: begin
-                alu_out <= A;
+                alu_out = A;
             end
         endcase
     end
@@ -172,21 +212,21 @@ module shf(clk, A, ir5_4, ammt4, shf_out);
 
     reg [15:0] A_sext;
 
-    always_ff @(posedge clk) begin
+    always_comb begin
         case(ir5_4)
             2'b00: begin
-                 shf_out <= (A << ammt4) && 16'hFFFF;
+                 shf_out = (A << ammt4) && 16'hFFFF;
             end
             2'b01: begin
-                shf_out <= (A >> ammt4) && 16'hFFFF;
+                shf_out = (A >> ammt4) && 16'hFFFF;
             end
             2'b10: begin
                 //will be skipped
-                shf_out <= A;
+                shf_out = A;
             end
             2'b11: begin
-                A_sext <= sext(A, 16);
-                shf_out <= (A_sext >> ammt4) && 16'hFFFF;
+                A_sext = sext(A, 16);
+                shf_out = (A_sext >> ammt4) && 16'hFFFF;
             end
         endcase
     end
@@ -201,8 +241,8 @@ module sr2_mux(clk, sr2muxsignal, readreg2, imm5, sr2_out);
     input [4:0] imm5;
     output reg [15:0] sr2_out;
 
-    always_ff @(posedge clk) begin
-        sr2_out <= sr2muxsignal ? sext(imm5, 16) : readreg2;
+    always_comb begin
+        sr2_out = sr2muxsignal ? sext(imm5, 16) : readreg2;
     end
 
 endmodule
@@ -214,18 +254,19 @@ module addr1_mux(clk, addr1mux, pc, readreg1, addr1_out);
     input [15:0] readreg1;
     output reg [15:0] addr1_out;
 
-    always_ff @(posedge clk) begin
-        addr1_out <= addr1mux ? readreg1 : pc;
+    always_comb begin
+        addr1_out = addr1mux ? readreg1 : pc;
     end
 endmodule
 
 module addr2_mux(clk, addr2mux, ir, addr2_out);
+    import packaged_functions::*;
     input clk;
     input [1:0] addr2mux;
     input [15:0] ir;
     output reg [15:0] addr2_out;
 
-    always_ff @(posedge clk) begin
+    always_comb begin
         case(addr2mux)
             2'b00: begin
                 addr2_out <= 16'h0000;
@@ -243,7 +284,7 @@ module addr2_mux(clk, addr2mux, ir, addr2_out);
     end
 endmodule
 
-module lshf1(clk, lshf1, in, lshf1_out);
+module lshf1mod(clk, lshf1, in, lshf1_out);
     input clk;
     input lshf1;
     input [15:0] in;
@@ -254,51 +295,51 @@ module lshf1(clk, lshf1, in, lshf1_out);
     end
 endmodule
 
-module adder_for_marmux_or_pcmux(clk, lsfh1_in, addr1mux_in, adder_out);
+module adder_for_marmux_or_pcmux(clk, lshf1_in, addr1mux_in, adder_out);
     input clk;
-    input [15:0] lsfh1_in;
+    input [15:0] lshf1_in;
     input [15:0] addr1mux_in;
     output reg [15:0] adder_out;
 
-    always_ff @(posedge clk) begin
-        adder_out <= lsfh1_in + addr1mux_in;
+    always_comb begin
+        adder_out = lshf1_in + addr1mux_in;
     end
 
 endmodule
 
-module mar_mux(clk, marmuxsignal, adder_out, ir, marmux_out);
+module mar_mux(clk, marmux, adder_out, ir, marmux_out);
     input clk;
-    input marmuxsignal;
+    input marmux;
     input [15:0] adder_out;
     input [15:0] ir;
     output reg [15:0] marmux_out;
 
-    always_ff @(posedge clk) begin
-        marmux_out <= marmuxsignal ? adder_out : (ir & 16'h00FF) << 1;
+    always_comb begin
+        marmux_out = marmux ? adder_out : (ir & 16'h00FF) << 1;
     end
 endmodule
 
-module pc_mux(clk, pcmuxsignal, adder_out, bus, pc, pcmux_out);
+module pc_mux(clk, pcmux, adder_out, bus, pc, pcmux_out);
     input clk;
-    input pcmuxsignal;
+    input pcmux;
     input [15:0] adder_out;
     input [31:0] bus;
     input [15:0] pc;
     output reg [15:0] pcmux_out;
 
-    always_ff @(posedge clk) begin
-        case(pcmuxsignal)
+    always_comb begin
+        case(pcmux)
             2'b00: begin
-                pcmux_out <= pc + 2;
+                pcmux_out = pc + 2;
             end
             2'b01: begin
-                pcmux_out <= bus[15:0];
+                pcmux_out = bus[15:0];
             end
             2'b10: begin
-                pcmux_out <= adder_out;
+                pcmux_out = adder_out;
             end
             default: begin
-                pcmux_out <= pc;
+                pcmux_out = pc;
             end
         endcase
     end
@@ -403,7 +444,7 @@ module mdr_in_logic(clk, bus, data_size, mdr_in_mioen_mux);
     input data_size;
     output reg [15:0] mdr_in_mioen_mux;
 
-    always_ff @(posedge clk) begin
+    always_comb begin
         if(data_size) begin
             mdr_in_mioen_mux <= bus[15:0];
         end
@@ -420,7 +461,7 @@ module mio_en_mux(clk, mio_en, mdr_in_mioen_mux, mdr_val_from_mem, mioen_out);
     input [15:0] mdr_val_from_mem;
     output reg [15:0] mioen_out;
 
-    always_ff @(posedge clk) begin
+    always_comb begin
         if(mio_en) begin
             mioen_out <= mdr_val_from_mem;
         end
@@ -437,7 +478,7 @@ module mdr_out_logic(clk, mdr, data_size, mar0, mdr_out);
     input mar0;
     output reg [15:0] mdr_out;
 
-    always_ff @(posedge clk) begin
+    always_comb begin
         if(data_size) begin
             mdr_out <= mdr;
         end
@@ -456,11 +497,11 @@ module we_logic(clk, rw, mar0, data_size, we_out);
 
     always_ff @(posedge clk) begin
         if(rw) begin
-            we[0] <= (!mar0 && !data_size) || (data_size && !mar0);
-            we[1] <= (mar0 && !data_size) || (data_size && !mar0);
+            we_out[0] <= (!mar0 && !data_size) || (data_size && !mar0);
+            we_out[1] <= (mar0 && !data_size) || (data_size && !mar0);
         end
         else begin
-            we <= 2'b00;
+            we_out <= 2'b00;
         end
     end
 endmodule
