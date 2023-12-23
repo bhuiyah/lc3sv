@@ -26,15 +26,17 @@ module memory(cs, we, clk, rw, address, memory_bus, r);
     input clk;
     input rw;
     input [15:0] address;
-    inout [31:0] memory_bus;
+    inout [15:0] memory_bus;
     output r;
 
-    reg [31:0] data_out;
-    reg [15:0] DRAM [16'h08000][2];
-    reg cycle_count;
+    reg [15:0] data_out;
+    reg [7:0] DRAM [16'h08000][2];
+    reg [3:0] cycle_count;
+    reg [14:0] acc_addr;
 
-    assign memory_bus = ((cs == 0) || (we == 1)) ? 32'bZ : data_out;
+    assign memory_bus = ((cs == 0) || (we == 1)) ? 16'bZ : data_out;
     assign r = (cycle_count == 5);
+    assign acc_addr = address[15:1];
 
     initial begin
         //$readmemh(); //will add with instructions, vectors, etc.
@@ -47,13 +49,13 @@ module memory(cs, we, clk, rw, address, memory_bus, r);
             if(cycle_count == 5) begin //5 cycles to read or write to DRAM
                 if(rw) begin //write
                     if(we[0])
-                        DRAM[address][0] <= memory_bus[15:0];
+                        DRAM[acc_addr][0] <= memory_bus[7:0];
 
                     if(we[1])
-                        DRAM[address][1] <= memory_bus[31:16];
+                        DRAM[acc_addr][1] <= memory_bus[15:8];
                 end
                 else //read
-                    data_out <= {DRAM[address][0], DRAM[address][1]};
+                    data_out <= {DRAM[acc_addr][0], DRAM[acc_addr][1]};
                 cycle_count <= 0; //reset cycle count after accessing DRAM
             end else
                 cycle_count <= cycle_count + 1;

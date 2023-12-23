@@ -47,23 +47,23 @@ module control(clk, r, opcode, ir11, ben, state_number, next_state_number, contr
         cond = control_store[state_number][33:32];
         j = control_store[state_number][31:26];
         
-        if(ird) begin
-            next_state_number <= opcode;
-        end
+        if(ird)
+            next_state_number <= {2'b00, opcode};
         else begin
             case(cond)
-                2'b00: begin
+
+                2'b00:
                     next_state_number <= j;
-                end
-                2'b01: begin
-                    next_state_number <= r ? (j | r << 1) : j;
-                end 
-                2'b10: begin
-                    next_state_number <= ben ? (j | ben << 2) : j;
-                end
-                2'b11 : begin
-                    next_state_number <= ir11 ? (j | ir11) : j;
-                end
+
+                2'b01:
+                    next_state_number <= j | ({5'b00000, r} << 1);
+
+                2'b10:
+                    next_state_number <= j | ({5'b00000, ben} << 2);
+
+                2'b11:
+                    next_state_number <= j | ({5'b00000, ir11});
+
             endcase
         end
     end

@@ -31,16 +31,13 @@ module register_file(clk, reg_write, DR, SR1, SR2, Reg_In, ReadReg1, ReadReg2);
     output reg [15:0] ReadReg2;
 
     reg [15:0] reg_file [7:0];
+
+    integer i;
     
     initial begin
-        reg_file[0] = 16'h0000;
-        reg_file[1] = 16'h0000;
-        reg_file[2] = 16'h0000;
-        reg_file[3] = 16'h0000;
-        reg_file[4] = 16'h0000;
-        reg_file[5] = 16'h0000;
-        reg_file[6] = 16'h0000;
-        reg_file[7] = 16'h0000;
+        for(i = 0; i < 8; i = i + 1) begin
+            reg_file[i] = 16'h0000;
+        end
         ReadReg1 = 16'h0000;
         ReadReg2 = 16'h0000;
     end
