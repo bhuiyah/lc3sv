@@ -18,9 +18,39 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
+package load_program_package;
+    task load_program(input string filename, ref bit [15:0] DRAM [16'h08000], output [15:0] start_pc, output bit en);
+        bit [14:0] i;
+        int file;
+        bit [15:0] word;
+        bit [14:0] program_base;
+        file = $fopen(filename, "r"); //open file for reading
+        //read the first line of the file
 
+        if($fscanf(file, "%x\n", word) == 0) begin
+            $display("Error: could not read file");
+            $finish;
+        end
 
-module memory(cs, we, clk, rw, address, memory_bus, r);
+        program_base = word[15:1]; //set program base to the first line of the file shifted right by 1 bit
+
+        //read the rest of the file
+
+        while(!$feof(file)) begin
+            $fscanf(file, "%x\n", word);
+            DRAM[program_base + i] = word;
+            i = i + 1;
+        end
+
+        $fclose(file);
+
+        start_pc = {program_base, 1'b0}; //set start_pc to the program base shifted left by 1 bit
+        en = 1;
+    endtask
+
+endpackage
+
+module memory(cs, we, clk, rw, address, memory_bus, r, start_pc, en);
     input cs;
     input[1:0] we;
     input clk;
@@ -28,20 +58,25 @@ module memory(cs, we, clk, rw, address, memory_bus, r);
     input [15:0] address;
     inout [15:0] memory_bus;
     output r;
+    output [15:0] start_pc;
+    output en;
 
     reg [15:0] data_out;
     reg [3:0] cycle_count;
     reg [14:0] acc_addr;
     
-    reg [7:0] DRAM_high [16'h08000];
-    reg [7:0] DRAM_low [16'h08000];
+    bit [15:0] DRAM [16'h08000];
     
     assign memory_bus = ((cs == 0) || (we == 1)) ? 16'bZ : data_out;
     assign r = (cycle_count == 5);
     assign acc_addr = address[15:1];
 
     initial begin
-        //$readmemh(); //will add with instructions, vectors, etc.
+        //call task to load program into DRAM
+        for(int i = 0; i < 16'h08000; i = i + 1)
+            DRAM[i] = 16'h0000;
+            
+        load_program_package::load_program("test.mem", DRAM, start_pc, en);
         cycle_count = 0;
     end
 
@@ -51,13 +86,13 @@ module memory(cs, we, clk, rw, address, memory_bus, r);
             if(cycle_count == 5) begin //5 cycles to read or write to DRAM
                 if(rw) begin //write
                     if(we[0])
-                        DRAM_low[acc_addr] <= memory_bus[7:0];
+                        DRAM[acc_addr][7:0] <= memory_bus[7:0];
 
                     if(we[1])
-                        DRAM_high[acc_addr] <= memory_bus[15:8];
+                        DRAM[acc_addr][15:8] <= memory_bus[15:8];
                 end
                 else //read
-                    data_out <= {DRAM_high[acc_addr], DRAM_low[acc_addr]};
+                    data_out <= DRAM[acc_addr];
                 cycle_count <= 0; //reset cycle count after accessing DRAM
             end else
                 cycle_count <= cycle_count + 1;

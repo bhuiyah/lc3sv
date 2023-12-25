@@ -3,16 +3,16 @@
 # SW Build 3865809 on Sun May  7 15:04:56 MDT 2023
 # IP Build 3864474 on Sun May  7 20:36:21 MDT 2023
 # SharedData Build 3865790 on Sun May 07 13:33:03 MDT 2023
-# Start of session at: Sat Dec 23 22:29:02 2023
-# Process ID: 5935
+# Start of session at: Sun Dec 24 19:47:36 2023
+# Process ID: 1829
 # Current directory: /home/user/lc3bsv/lc3bsv.runs/synth_1
 # Command line: vivado -log LC3.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source LC3.tcl
 # Log file: /home/user/lc3bsv/lc3bsv.runs/synth_1/LC3.vds
 # Journal file: /home/user/lc3bsv/lc3bsv.runs/synth_1/vivado.jou
-# Running On: d3831a49265a, OS: Linux, CPU Frequency: , CPU Physical cores: 1, Host memory: 8232 MB
+# Running On: fecbc163686d, OS: Linux, CPU Frequency: , CPU Physical cores: 1, Host memory: 8232 MB
 #-----------------------------------------------------------
 source LC3.tcl -notrace
-create_project: Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2622.477 ; gain = 52.152 ; free physical = 3914 ; free virtual = 6149
+create_project: Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2622.488 ; gain = 52.152 ; free physical = 5286 ; free virtual = 7304
 Command: read_checkpoint -auto_incremental -incremental /home/user/lc3bsv/lc3bsv.srcs/utils_1/imports/synth_1/LC3.dcp
 INFO: [Vivado 12-5825] Read reference checkpoint from /home/user/lc3bsv/lc3bsv.srcs/utils_1/imports/synth_1/LC3.dcp for incremental synthesis
 INFO: [Vivado 12-7989] Please ensure there are no constraint changes
@@ -24,9 +24,9 @@ INFO: [Designutils 20-5440] No compile time benefit to using incremental synthes
 INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 4 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 5966
+INFO: [Synth 8-7075] Helper process launched with PID 1857
 ---------------------------------------------------------------------------------
-Starting Synthesize : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 3046.875 ; gain = 388.828 ; free physical = 3388 ; free virtual = 5495
+Starting Synthesize : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 3047.832 ; gain = 389.785 ; free physical = 4770 ; free virtual = 6652
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-6157] synthesizing module 'LC3' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/LC3.sv:22]
 INFO: [Synth 8-6157] synthesizing module 'memory' [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/memory.sv:23]
@@ -124,10 +124,10 @@ WARNING: [Synth 8-7129] Port control_signals[1] in module datapath is either unc
 WARNING: [Synth 8-7129] Port control_signals[0] in module datapath is either unconnected or has no load
 WARNING: [Synth 8-7129] Port address[0] in module memory is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished Synthesize : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 3119.551 ; gain = 461.504 ; free physical = 3009 ; free virtual = 5243
+Finished Synthesize : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 3119.500 ; gain = 461.457 ; free physical = 4375 ; free virtual = 6394
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 3134.547 ; gain = 476.500 ; free physical = 3008 ; free virtual = 5242
+Finished Constraint Validation : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 3134.492 ; gain = 476.445 ; free physical = 4372 ; free virtual = 6393
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
@@ -135,10 +135,10 @@ Start Loading Part and Timing Information
 Loading part: xc7k70tfbv676-1
 ---------------------------------------------------------------------------------
 INFO: [Device 21-403] Loading part xc7k70tfbv676-1
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 3142.707 ; gain = 484.660 ; free physical = 3007 ; free virtual = 5241
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 3142.660 ; gain = 484.613 ; free physical = 4372 ; free virtual = 6393
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 3154.359 ; gain = 496.312 ; free physical = 2982 ; free virtual = 5216
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 3155.203 ; gain = 497.156 ; free physical = 4345 ; free virtual = 6366
 ---------------------------------------------------------------------------------
 No constraint files found.
 ---------------------------------------------------------------------------------
@@ -191,20 +191,20 @@ Start Cross Boundary and Area Optimization
 WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
 WARNING: [Synth 8-3936] Found unconnected internal register 'lc3/ir_r/ir_reg' and it is trimmed from '16' to '12' bits. [/home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv:379]
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 3344.336 ; gain = 686.289 ; free physical = 2758 ; free virtual = 4996
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 3345.133 ; gain = 687.086 ; free physical = 4092 ; free virtual = 6143
 ---------------------------------------------------------------------------------
 No constraint files found.
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 3344.703 ; gain = 686.656 ; free physical = 2756 ; free virtual = 4993
+Finished Timing Optimization : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 3345.516 ; gain = 687.469 ; free physical = 4089 ; free virtual = 6140
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Technology Mapping
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 3344.801 ; gain = 686.754 ; free physical = 2748 ; free virtual = 4985
+Finished Technology Mapping : Time (s): cpu = 00:00:16 ; elapsed = 00:00:18 . Memory (MB): peak = 3345.609 ; gain = 687.562 ; free physical = 4083 ; free virtual = 6134
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -222,37 +222,37 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:00:20 ; elapsed = 00:00:22 . Memory (MB): peak = 3344.875 ; gain = 686.828 ; free physical = 2746 ; free virtual = 4984
+Finished IO Insertion : Time (s): cpu = 00:00:20 ; elapsed = 00:00:22 . Memory (MB): peak = 3345.684 ; gain = 687.637 ; free physical = 4082 ; free virtual = 6134
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:00:20 ; elapsed = 00:00:22 . Memory (MB): peak = 3344.883 ; gain = 686.836 ; free physical = 2746 ; free virtual = 4984
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:20 ; elapsed = 00:00:22 . Memory (MB): peak = 3345.691 ; gain = 687.645 ; free physical = 4082 ; free virtual = 6134
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:20 ; elapsed = 00:00:22 . Memory (MB): peak = 3344.914 ; gain = 686.867 ; free physical = 2746 ; free virtual = 4984
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3345.723 ; gain = 687.676 ; free physical = 4082 ; free virtual = 6134
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:00:20 ; elapsed = 00:00:22 . Memory (MB): peak = 3344.922 ; gain = 686.875 ; free physical = 2746 ; free virtual = 4984
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3345.730 ; gain = 687.684 ; free physical = 4082 ; free virtual = 6133
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:20 ; elapsed = 00:00:22 . Memory (MB): peak = 3344.934 ; gain = 686.887 ; free physical = 2746 ; free virtual = 4983
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3345.742 ; gain = 687.695 ; free physical = 4082 ; free virtual = 6133
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:00:20 ; elapsed = 00:00:22 . Memory (MB): peak = 3344.938 ; gain = 686.891 ; free physical = 2746 ; free virtual = 4983
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3345.746 ; gain = 687.699 ; free physical = 4082 ; free virtual = 6133
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -277,16 +277,16 @@ Report Instance Areas:
 |1     |top      |       |     0|
 +------+---------+-------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:00:20 ; elapsed = 00:00:22 . Memory (MB): peak = 3344.969 ; gain = 686.922 ; free physical = 2746 ; free virtual = 4983
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3345.777 ; gain = 687.730 ; free physical = 4082 ; free virtual = 6133
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 0 critical warnings and 45 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:00:20 ; elapsed = 00:00:22 . Memory (MB): peak = 3344.988 ; gain = 686.938 ; free physical = 2746 ; free virtual = 4983
-Synthesis Optimization Complete : Time (s): cpu = 00:00:20 ; elapsed = 00:00:22 . Memory (MB): peak = 3345.000 ; gain = 686.941 ; free physical = 2746 ; free virtual = 4983
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3345.797 ; gain = 687.750 ; free physical = 4082 ; free virtual = 6133
+Synthesis Optimization Complete : Time (s): cpu = 00:00:20 ; elapsed = 00:00:23 . Memory (MB): peak = 3345.809 ; gain = 687.750 ; free physical = 4082 ; free virtual = 6133
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3345.770 ; gain = 0.020 ; free physical = 3120 ; free virtual = 5365
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 3346.578 ; gain = 0.020 ; free physical = 4461 ; free virtual = 6519
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3437.879 ; gain = 0.000 ; free physical = 3028 ; free virtual = 5276
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3437.754 ; gain = 0.000 ; free physical = 4354 ; free virtual = 6426
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
@@ -294,9 +294,9 @@ Synth Design complete | Checksum: a0db3b01
 INFO: [Common 17-83] Releasing license: Synthesis
 66 Infos, 45 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:00:29 ; elapsed = 00:00:25 . Memory (MB): peak = 3437.965 ; gain = 790.684 ; free physical = 3028 ; free virtual = 5276
-INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 2050.289; main = 1616.189; forked = 578.042
-INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 7867.129; main = 3437.965; forked = 4522.285
+synth_design: Time (s): cpu = 00:00:29 ; elapsed = 00:00:26 . Memory (MB): peak = 3437.836 ; gain = 790.551 ; free physical = 4354 ; free virtual = 6426
+INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 2047.760; main = 1616.277; forked = 578.264
+INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 7867.953; main = 3437.836; forked = 4522.301
 INFO: [Common 17-1381] The checkpoint '/home/user/lc3bsv/lc3bsv.runs/synth_1/LC3.dcp' has been generated.
 INFO: [runtcl-4] Executing : report_utilization -file LC3_utilization_synth.rpt -pb LC3_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Sat Dec 23 22:29:44 2023...
+INFO: [Common 17-206] Exiting Vivado at Sun Dec 24 19:48:19 2023...

@@ -19,9 +19,10 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module LC3(clk);
+module LC3(clk, prog_file);
 
 input clk;
+input string prog_file;
 
 wire cs;
 wire [1:0] we;
@@ -36,8 +37,10 @@ wire slow_clk;
 wire [5:0] state_number;
 wire [5:0] next_state_number;
 wire rw;
+wire [15:0] start_pc;
+wire en;
 
-memory mem(.cs(cs), .we(we), .clk(clk), .rw(rw), .address(address), .memory_bus(memory_bus), .r(r));
+memory mem(.cs(cs), .we(we), .clk(clk), .rw(rw), .address(address), .memory_bus(memory_bus), .r(r), .start_pc(start_pc), .en(en));
 datapath lc3(.clk(clk), .cs(cs), .we(we), .address(address), .memory_bus(memory_bus), .control_signals(control_signals), .opcode(opcode), .ir11(ir11), .ben(ben), .rw(rw), .r(r));
 control cont(.clk(clk), .r(r), .opcode(opcode), .ir11(ir11), .ben(ben), .state_number(state_number), .next_state_number(next_state_number), .control_signals(control_signals));
 

@@ -49,7 +49,7 @@ typedef enum bit[5:0] {
     control_store_bits
 } cs_bits;
 
-package packaged_functions;
+package sign_extend_package;
     function automatic [15:0] sext(input [15:0] A, input [4:0] num_bits); 
 
         reg sign_bit;
@@ -67,7 +67,7 @@ package packaged_functions;
     endfunction
 endpackage
 
-import packaged_functions::*;
+import sign_extend_package::*;
 
 module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r);
     input clk;
