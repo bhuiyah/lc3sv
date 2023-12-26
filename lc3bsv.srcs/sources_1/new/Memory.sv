@@ -18,8 +18,25 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-package load_program_package;
-    task load_program(input string filename, ref bit [15:0] DRAM [16'h08000], output [15:0] start_pc, output bit en);
+
+module memory(cs, we, clk, rw, address, memory_bus, r, start_pc, memory_initialized);
+    input cs;
+    input[1:0] we;
+    input clk;
+    input rw;
+    input [15:0] address;
+    inout [15:0] memory_bus;
+    output r;
+    output reg [15:0] start_pc;
+    output reg memory_initialized;
+
+    reg [15:0] data_out;
+    reg [3:0] cycle_count;
+    reg [14:0] acc_addr;
+    
+    bit [15:0] DRAM [16'h08000];
+
+    task automatic load_program(input string filename, ref bit [15:0] DRAM [16'h08000], output [15:0] start_pc, output bit memory_initialized);
         bit [14:0] i;
         int file;
         bit [15:0] word;
@@ -45,27 +62,8 @@ package load_program_package;
         $fclose(file);
 
         start_pc = {program_base, 1'b0}; //set start_pc to the program base shifted left by 1 bit
-        en = 1;
+        memory_initialized = 1;
     endtask
-
-endpackage
-
-module memory(cs, we, clk, rw, address, memory_bus, r, start_pc, en);
-    input cs;
-    input[1:0] we;
-    input clk;
-    input rw;
-    input [15:0] address;
-    inout [15:0] memory_bus;
-    output r;
-    output [15:0] start_pc;
-    output en;
-
-    reg [15:0] data_out;
-    reg [3:0] cycle_count;
-    reg [14:0] acc_addr;
-    
-    bit [15:0] DRAM [16'h08000];
     
     assign memory_bus = ((cs == 0) || (we == 1)) ? 16'bZ : data_out;
     assign r = (cycle_count == 5);
@@ -73,10 +71,8 @@ module memory(cs, we, clk, rw, address, memory_bus, r, start_pc, en);
 
     initial begin
         //call task to load program into DRAM
-        for(int i = 0; i < 16'h08000; i = i + 1)
-            DRAM[i] = 16'h0000;
             
-        load_program_package::load_program("test.mem", DRAM, start_pc, en);
+        load_program("test.mem", DRAM, start_pc, memory_initialized);
         cycle_count = 0;
     end
 

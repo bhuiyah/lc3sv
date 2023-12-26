@@ -84,7 +84,11 @@ set_property ip_output_repo /home/user/lc3bsv/lc3bsv.cache/ip [current_project]
 set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
-read_mem /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/ucode3.mem
+read_verilog /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/enum_and_func.vh
+read_mem {
+  /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/ucode3.mem
+  /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/test.mem
+}
 read_verilog -library xil_defaultlib -sv {
   /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/control.sv
   /home/user/lc3bsv/lc3bsv.srcs/sources_1/new/datapath.sv

@@ -19,60 +19,14 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-typedef enum bit[5:0] {
-    ird_idx,
-    cond1_idx, cond0_idx,
-    j5_idx, j4_idx, j3_idx, j2_idx, j1_idx, j0_idx,
-    ld_mar_idx,
-    ld_mdr_idx,
-    ld_ir_idx,
-    ld_ben_idx,
-    ld_reg_idx,
-    ld_cc_idx,
-    ld_pc_idx,
-    gate_pc_idx,
-    gate_mdr_idx,
-    gate_alu_idx,
-    gate_marmux_idx,
-    gate_shf_idx,
-    pcmux1_idx, pcmux0_idx,
-    drmux_idx,
-    sr1mux_idx,
-    addr1mux_idx,
-    addr2mux1_idx, addr2mux0_idx,
-    marmux_idx,
-    aluk1_idx, aluk0_idx,
-    mio_en_idx,
-    r_w_idx,
-    data_size_idx,
-    lshf1_idx,
-    control_store_bits
-} cs_bits;
+`include "enum_and_func.vh"
+import enum_and_pkg::*;
 
-package sign_extend_package;
-    function automatic [15:0] sext(input [15:0] A, input [4:0] num_bits); 
-
-        reg sign_bit;
-        reg [15:0] mask;
-
-        sign_bit = A[num_bits - 1] && 1;
-        if(sign_bit) begin
-            mask = {16'hFFFF << num_bits};
-            sext = A | mask;
-        end
-        else begin
-            sext = A;
-        end
-        return sext;
-    endfunction
-endpackage
-
-import sign_extend_package::*;
-
-module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r);
-    input clk;
+module datapath(cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r, start_pc, memory_initialized);
     input [34:0] control_signals;
     input r;
+    input [15:0] start_pc;
+    input memory_initialized;
 
     inout [15:0] memory_bus;
 
@@ -95,7 +49,7 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     bit gatepc = control_signals[gate_pc_idx];
     bit gatemdr = control_signals[gate_mdr_idx];
     bit gatealu = control_signals[gate_alu_idx];
-    bit gatemarmux = control_signals[gate_marmux_idx];
+    bit gatemarmux  = control_signals[gate_marmux_idx];
     bit gateshf = control_signals[gate_shf_idx];
     bit [1:0] pcmux = {control_signals[pcmux1_idx], control_signals[pcmux0_idx]};
     bit [1:0] addr2mux = {control_signals[addr2mux1_idx], control_signals[addr2mux0_idx]};
@@ -134,36 +88,35 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     assign address = mar;
 
     //wiring the datapath
-    register_file reg_file(.clk(clk), .reg_write(ldreg), .DR(dr), .SR1(sr1), .SR2(sr2), .Reg_In(bus_contents), .ReadReg1(readreg1), .ReadReg2(readreg2));
-    bus b_u_s(.clk(clk), .alu_out(alu_out), .shf_out(shf_out), .mdr_out(mdr_out), .pc_out(pc_out), .marmux_out(marmux_out), .gatealu(gatealu), .gateshf(gateshf), .gatemdr(gatemdr), .gatepc(gatepc), .gatemarmux(gatemarmux), .bus_contents(bus_contents));
-    sr2_mux sr2_mux(.clk(clk), .sr2muxsignal(instruction[5]), .readreg2(readreg2), .imm5(instruction[4:0]), .sr2_out(B));
-    alu a_l_u(.clk(clk), .A(A), .B(B), .aluk(aluk), .alu_out(alu_out));
-    shf s_h_f(.clk(clk), .A(A), .ir5_4(instruction[5:4]), .ammt4(instruction[3:0]), .shf_out(shf_out));
-    addr1_mux addr1_mx(.clk(clk), .addr1mux(addr1mux), .pc(pc), .readreg1(readreg1), .addr1_out(addr1_out));
-    addr2_mux addr2_mx(.clk(clk), .addr2mux(addr2mux), .ir(instruction), .addr2_out(addr2_out));
-    lshf1mod lshf(.clk(clk), .lshf1(lshf1), .in(addr2_out), .lshf1_out(lshf1_out));
-    adder_for_marmux_or_pcmux adder(.clk(clk), .lshf1_in(lshf1_out), .addr1mux_in(addr1_out), .adder_out(adder_out));
-    mar_mux mar_mx(.clk(clk), .marmux(marmux), .adder_out(adder_out), .ir(instruction), .marmux_out(marmux_out));
-    pc_mux pc_mx(.clk(clk), .pcmux(pcmux), .adder_out(adder_out), .bus(bus_contents), .pc(pc), .pcmux_out(pc_out));
+    register_file reg_file(.reg_write(ldreg), .DR(dr), .SR1(sr1), .SR2(sr2), .Reg_In(bus_contents), .ReadReg1(readreg1), .ReadReg2(readreg2));
+    bus b_u_s(.alu_out(alu_out), .shf_out(shf_out), .mdr_out(mdr_out), .pc_out(pc_out), .marmux_out(marmux_out), .gatealu(gatealu), .gateshf(gateshf), .gatemdr(gatemdr), .gatepc(gatepc), .gatemarmux(gatemarmux), .bus_contents(bus_contents));
+    sr2_mux sr2_mux(.sr2muxsignal(instruction[5]), .readreg2(readreg2), .imm5(instruction[4:0]), .sr2_out(B));
+    alu a_l_u(.A(A), .B(B), .aluk(aluk), .alu_out(alu_out));
+    shf s_h_f(.A(A), .ir5_4(instruction[5:4]), .ammt4(instruction[3:0]), .shf_out(shf_out));
+    addr1_mux addr1_mx(.addr1mux(addr1mux), .pc(pc), .readreg1(readreg1), .addr1_out(addr1_out));
+    addr2_mux addr2_mx(.addr2mux(addr2mux), .ir(instruction), .addr2_out(addr2_out));
+    lshf1mod lshf(.lshf1(lshf1), .in(addr2_out), .lshf1_out(lshf1_out));
+    adder_for_marmux_or_pcmux adder(.lshf1_in(lshf1_out), .addr1mux_in(addr1_out), .adder_out(adder_out));
+    mar_mux mar_mx(.marmux(marmux), .adder_out(adder_out), .ir(instruction), .marmux_out(marmux_out));
+    pc_mux pc_mx(.pcmux(pcmux), .adder_out(adder_out), .bus(bus_contents), .pc(pc), .pcmux_out(pc_out));
 
     //loading registers
-    ir_reg ir_r(.clk(clk), .ld_ir(ldir), .bus(bus_contents), .ir(instruction));
-    ben_reg ben_r(.clk(clk), .ldben(ldben), .ir(instruction), .cc(cc), .ben(ben));
-    cc_reg cc_r(.clk(clk), .ldcc(ldcc), .bus(bus_contents), .cc(cc));
-    pc_reg pc_r(.clk(clk), .ldpc(ldpc), .pcmux_out(pc_out), .pc(pc));
-    mar_reg mar_r(.clk(clk), .ldmar(ldmar), .bus(bus_contents), .mar(mar));
-    mdr_reg mdr_r(.clk(clk), .ldmdr(ldmdr), .mioen_out(mioen_out), .mdr(mdr));
+    ir_reg ir_r(.ld_ir(ldir), .bus(bus_contents), .ir(instruction));
+    ben_reg ben_r(.ldben(ldben), .ir(instruction), .cc(cc), .ben(ben));
+    cc_reg cc_r(.ldcc(ldcc), .bus(bus_contents), .cc(cc));
+    pc_reg pc_r(.ldpc(ldpc), .pcmux_out(pc_out), .pc(pc), .start_pc(start_pc), .memory_initialized(memory_initialized));
+    mar_reg mar_r(.ldmar(ldmar), .bus(bus_contents), .mar(mar));
+    mdr_reg mdr_r(.ldmdr(ldmdr), .mioen_out(mioen_out), .mdr(mdr));
 
     //memory management
-    mdr_in_logic mdr_in(.clk(clk), .bus(bus_contents), .data_size(data_size), .mdr_in_mioen_mux(mdr_in_mioen_mux));
-    mio_en_mux mio_en_mx(.clk(clk), .mio_en(mio_en), .mdr_in_mioen_mux(mdr_in_mioen_mux), .mdr_val_from_mem(mdr_val_from_mem), .mioen_out(mioen_out));
-    mdr_out_logic mdr_out_log(.clk(clk), .mdr(mdr), .data_size(data_size), .mar0(mar[0]), .mdr_out(mdr_out));
-    we_logic we_l(.clk(clk), .rw(rw), .mar0(mar[0]), .data_size(data_size), .we_out(we_out));
+    mdr_in_logic mdr_in(.bus(bus_contents), .data_size(data_size), .mdr_in_mioen_mux(mdr_in_mioen_mux));
+    mio_en_mux mio_en_mx(.mio_en(mio_en), .mdr_in_mioen_mux(mdr_in_mioen_mux), .mdr_val_from_mem(mdr_val_from_mem), .mioen_out(mioen_out));
+    mdr_out_logic mdr_out_log(.mdr(mdr), .data_size(data_size), .mar0(mar[0]), .mdr_out(mdr_out));
+    we_logic we_l(.rw(rw), .mar0(mar[0]), .data_size(data_size), .we_out(we_out));
 
 endmodule
 
-module bus(clk, alu_out, shf_out, mdr_out, pc_out, marmux_out, gatealu, gateshf, gatemdr, gatepc, gatemarmux, bus_contents);
-    input clk;
+module bus(alu_out, shf_out, mdr_out, pc_out, marmux_out, gatealu, gateshf, gatemdr, gatepc, gatemarmux, bus_contents);
     input [15:0] alu_out;
     input [15:0] shf_out;
     input [15:0] mdr_out;
@@ -172,30 +125,29 @@ module bus(clk, alu_out, shf_out, mdr_out, pc_out, marmux_out, gatealu, gateshf,
     input bit gatealu, gateshf, gatemdr, gatepc, gatemarmux;
     output reg [15:0] bus_contents;
 
-    always@(posedge clk) begin
+    always@(*) begin
         if(gatealu) begin
-            bus_contents <= alu_out;
+            bus_contents = alu_out;
         end
         else if(gateshf) begin
-            bus_contents <= shf_out;
+            bus_contents = shf_out;
         end
         else if(gatemdr) begin
-            bus_contents <= mdr_out;
+            bus_contents = mdr_out;
         end
         else if(gatepc) begin
-            bus_contents <= pc_out;
+            bus_contents = pc_out;
         end
         else if(gatemarmux) begin
-            bus_contents <= marmux_out;
+            bus_contents = marmux_out;
         end
         else begin
-            bus_contents <= 16'h0000;
+            bus_contents = 16'h0000;
         end
     end
 endmodule
 
-module alu(clk, A, B, aluk, alu_out);
-    input clk;
+module alu(A, B, aluk, alu_out);
     input [15:0] A;
     input [15:0] B;
     input bit [1:0] aluk;
@@ -219,10 +171,7 @@ module alu(clk, A, B, aluk, alu_out);
     end
 endmodule
 
-module shf(clk, A, ir5_4, ammt4, shf_out);
-    // import packaged_functions::*;
-
-    input clk;
+module shf(A, ir5_4, ammt4, shf_out);
     input [15:0] A;
     input [1:0] ir5_4;
     input [3:0] ammt4;
@@ -254,9 +203,7 @@ module shf(clk, A, ir5_4, ammt4, shf_out);
     
 endmodule
 
-module sr2_mux(clk, sr2muxsignal, readreg2, imm5, sr2_out);
-    // import packaged_functions::*;
-    input clk;
+module sr2_mux(sr2muxsignal, readreg2, imm5, sr2_out);
     input bit sr2muxsignal;
     input [15:0] readreg2;
     input [4:0] imm5;
@@ -268,8 +215,7 @@ module sr2_mux(clk, sr2muxsignal, readreg2, imm5, sr2_out);
 
 endmodule
 
-module addr1_mux(clk, addr1mux, pc, readreg1, addr1_out);
-    input clk;
+module addr1_mux(addr1mux, pc, readreg1, addr1_out);
     input addr1mux;
     input [15:0] pc;
     input [15:0] readreg1;
@@ -280,9 +226,7 @@ module addr1_mux(clk, addr1mux, pc, readreg1, addr1_out);
     end
 endmodule
 
-module addr2_mux(clk, addr2mux, ir, addr2_out);
-    // import packaged_functions::*;
-    input clk;
+module addr2_mux(addr2mux, ir, addr2_out);
     input [1:0] addr2mux;
     input [15:0] ir;
     output reg [15:0] addr2_out;
@@ -306,19 +250,17 @@ module addr2_mux(clk, addr2mux, ir, addr2_out);
     end
 endmodule
 
-module lshf1mod(clk, lshf1, in, lshf1_out);
-    input clk;
+module lshf1mod(lshf1, in, lshf1_out);
     input lshf1;
     input [15:0] in;
     output reg [15:0] lshf1_out;
 
-    always_ff @(posedge clk) begin
-        lshf1_out <= lshf1 ? (in << 1) : in;
+    always_comb begin
+        lshf1_out = lshf1 ? (in << 1) : in;
     end
 endmodule
 
-module adder_for_marmux_or_pcmux(clk, lshf1_in, addr1mux_in, adder_out);
-    input clk;
+module adder_for_marmux_or_pcmux(lshf1_in, addr1mux_in, adder_out);
     input [15:0] lshf1_in;
     input [15:0] addr1mux_in;
     output reg [15:0] adder_out;
@@ -329,8 +271,7 @@ module adder_for_marmux_or_pcmux(clk, lshf1_in, addr1mux_in, adder_out);
 
 endmodule
 
-module mar_mux(clk, marmux, adder_out, ir, marmux_out);
-    input clk;
+module mar_mux(marmux, adder_out, ir, marmux_out);
     input marmux;
     input [15:0] adder_out;
     input [15:0] ir;
@@ -341,8 +282,7 @@ module mar_mux(clk, marmux, adder_out, ir, marmux_out);
     end
 endmodule
 
-module pc_mux(clk, pcmux, adder_out, bus, pc, pcmux_out);
-    input clk;
+module pc_mux(pcmux, adder_out, bus, pc, pcmux_out);
     input [1:0] pcmux;
     input [15:0] adder_out;
     input [15:0] bus;
@@ -368,21 +308,19 @@ module pc_mux(clk, pcmux, adder_out, bus, pc, pcmux_out);
 endmodule
 
 //////////loading registers//////////
-module ir_reg(clk, ld_ir, bus, ir);
-    input clk;
+module ir_reg(ld_ir, bus, ir);
     input ld_ir;
     input [15:0] bus;
     output reg [15:0] ir;
 
-    always_ff @(posedge clk) begin
+    always_latch begin
         if(ld_ir) begin
-            ir <= bus[15:0];
+            ir = bus[15:0];
         end
     end
 endmodule
 
-module ben_reg(clk, ldben, ir, cc, ben);
-    input clk;
+module ben_reg(ldben, ir, cc, ben);
     input ldben;
     input [15:0] ir;
     input [2:0] cc;
@@ -396,15 +334,14 @@ module ben_reg(clk, ldben, ir, cc, ben);
     wire ir10 = ir[10];
     wire ir9 = ir[9];
 
-    always_ff @(posedge clk) begin
+    always_latch begin
         if(ldben) begin
-            ben <= ir11 & curr_n | ir10 & curr_z | ir9 & curr_p;
+            ben = ir11 & curr_n | ir10 & curr_z | ir9 & curr_p;
         end
     end
 endmodule
 
-module cc_reg(clk, ldcc, bus, cc); 
-    input clk;
+module cc_reg(ldcc, bus, cc); 
     input ldcc;
     input [15:0] bus;
     output reg [2:0] cc;
@@ -413,55 +350,60 @@ module cc_reg(clk, ldcc, bus, cc);
     wire z = (bus == 0);
     wire p = ~n & ~z;
 
-    always_ff @(posedge clk) begin
+    always_latch begin
         if(ldcc) begin
-            cc <= n ? 3'b100 : (z ? 3'b010 : (p ? 3'b001 : 3'b000));
+            cc = n ? 3'b100 : (z ? 3'b010 : (p ? 3'b001 : 3'b000));
         end
     end
 endmodule
 
-module pc_reg(clk, ldpc, pcmux_out, pc);
-    input clk;
+module pc_reg(ldpc, pcmux_out, pc, start_pc, memory_initialized);
     input ldpc;
     input [15:0] pcmux_out;
+    input [15:0] start_pc;
+    input memory_initialized;
     output reg [15:0] pc;
 
-    always_ff @(posedge clk) begin
+    reg initialized = 0;
+
+    always_latch begin
+        if(memory_initialized && !initialized) begin
+            pc = start_pc;
+            initialized = 1;
+        end
+
         if(ldpc) begin
-            pc <= pcmux_out;
+            pc = pcmux_out;
         end
     end
 endmodule
 
-module mar_reg(clk, ldmar, bus, mar);
-    input clk;
+module mar_reg(ldmar, bus, mar);
     input ldmar;
     input [15:0] bus;
     output reg [15:0] mar;
 
-    always_ff @(posedge clk) begin
+    always_latch begin
         if(ldmar) begin
-            mar <= bus[15:0];
+            mar = bus[15:0];
         end
     end
 endmodule
 
-module mdr_reg(clk, ldmdr, mioen_out, mdr);
-    input clk;
+module mdr_reg(ldmdr, mioen_out, mdr);
     input ldmdr;
     input [15:0] mioen_out;
     output reg [15:0] mdr;
 
-    always_ff @(posedge clk) begin
+    always_latch begin
         if(ldmdr) begin
-            mdr <= mioen_out;
+            mdr = mioen_out;
         end
     end
 endmodule
 
 //////////memory management//////////
-module mdr_in_logic(clk, bus, data_size, mdr_in_mioen_mux);
-    input clk;
+module mdr_in_logic(bus, data_size, mdr_in_mioen_mux);
     input [15:0] bus;
     input data_size;
     output reg [15:0] mdr_in_mioen_mux;
@@ -476,8 +418,7 @@ module mdr_in_logic(clk, bus, data_size, mdr_in_mioen_mux);
     end
 endmodule
 
-module mio_en_mux(clk, mio_en, mdr_in_mioen_mux, mdr_val_from_mem, mioen_out);
-    input clk;
+module mio_en_mux(mio_en, mdr_in_mioen_mux, mdr_val_from_mem, mioen_out);
     input mio_en;
     input [15:0] mdr_in_mioen_mux;
     input [15:0] mdr_val_from_mem;
@@ -493,8 +434,7 @@ module mio_en_mux(clk, mio_en, mdr_in_mioen_mux, mdr_val_from_mem, mioen_out);
     end
 endmodule
 
-module mdr_out_logic(clk, mdr, data_size, mar0, mdr_out);
-    input clk;
+module mdr_out_logic(mdr, data_size, mar0, mdr_out);
     input [15:0] mdr;
     input data_size;
     input mar0;
@@ -510,20 +450,19 @@ module mdr_out_logic(clk, mdr, data_size, mar0, mdr_out);
     end
 endmodule
 
-module we_logic(clk, rw, mar0, data_size, we_out);
-    input clk;
+module we_logic(rw, mar0, data_size, we_out);
     input rw;
     input mar0;
     input data_size;
     output reg [1:0] we_out; //we1 for high byte, we0 for low byte
 
-    always_ff @(posedge clk) begin
+    always_comb begin
         if(rw) begin
-            we_out[0] <= (!mar0 && !data_size) || (data_size && !mar0);
-            we_out[1] <= (mar0 && !data_size) || (data_size && !mar0);
+            we_out[0] = (!mar0 && !data_size) || (data_size && !mar0);
+            we_out[1] = (mar0 && !data_size) || (data_size && !mar0);
         end
         else begin
-            we_out <= 2'b00;
+            we_out = 2'b00;
         end
     end
 endmodule
