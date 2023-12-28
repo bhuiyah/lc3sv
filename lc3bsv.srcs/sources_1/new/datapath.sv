@@ -22,7 +22,8 @@
 `include "enum_and_func.vh"
 import enum_and_pkg::*;
 
-module datapath(cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r, start_pc, memory_initialized);
+module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r, start_pc, memory_initialized);
+    input clk;
     input [34:0] control_signals;
     input r;
     input [15:0] start_pc;
@@ -88,7 +89,7 @@ module datapath(cs, we, address, memory_bus, control_signals, opcode, ir11, ben,
     assign address = mar;
 
     //wiring the datapath
-    register_file reg_file(.reg_write(ldreg), .DR(dr), .SR1(sr1), .SR2(sr2), .Reg_In(bus_contents), .ReadReg1(readreg1), .ReadReg2(readreg2));
+    register_file reg_file(.clk(clk), .reg_write(ldreg), .DR(dr), .SR1(sr1), .SR2(sr2), .Reg_In(bus_contents), .ReadReg1(readreg1), .ReadReg2(readreg2));
     bus b_u_s(.alu_out(alu_out), .shf_out(shf_out), .mdr_out(mdr_out), .pc_out(pc_out), .marmux_out(marmux_out), .gatealu(gatealu), .gateshf(gateshf), .gatemdr(gatemdr), .gatepc(gatepc), .gatemarmux(gatemarmux), .bus_contents(bus_contents));
     sr2_mux sr2_mux(.sr2muxsignal(instruction[5]), .readreg2(readreg2), .imm5(instruction[4:0]), .sr2_out(B));
     alu a_l_u(.A(A), .B(B), .aluk(aluk), .alu_out(alu_out));
@@ -101,12 +102,12 @@ module datapath(cs, we, address, memory_bus, control_signals, opcode, ir11, ben,
     pc_mux pc_mx(.pcmux(pcmux), .adder_out(adder_out), .bus(bus_contents), .pc(pc), .pcmux_out(pc_out));
 
     //loading registers
-    ir_reg ir_r(.ld_ir(ldir), .bus(bus_contents), .ir(instruction));
+    ir_reg ir_r(.ld_ir(ldir), .bus(bus_contents), .ir_out(instruction));
     ben_reg ben_r(.ldben(ldben), .ir(instruction), .cc(cc), .ben(ben));
     cc_reg cc_r(.ldcc(ldcc), .bus(bus_contents), .cc(cc));
-    pc_reg pc_r(.ldpc(ldpc), .pcmux_out(pc_out), .pc(pc), .start_pc(start_pc), .memory_initialized(memory_initialized));
-    mar_reg mar_r(.ldmar(ldmar), .bus(bus_contents), .mar(mar));
-    mdr_reg mdr_r(.ldmdr(ldmdr), .mioen_out(mioen_out), .mdr(mdr));
+    pc_reg pc_r(.ldpc(ldpc), .pcmux_out(pc_out), .pc_out(pc), .start_pc(start_pc), .memory_initialized(memory_initialized));
+    mar_reg mar_r(.ldmar(ldmar), .bus(bus_contents), .mar_out(mar));
+    mdr_reg mdr_r(.ldmdr(ldmdr), .mioen_out(mioen_out), .mdr_out(mdr));
 
     //memory management
     mdr_in_logic mdr_in(.bus(bus_contents), .data_size(data_size), .mdr_in_mioen_mux(mdr_in_mioen_mux));
@@ -295,7 +296,7 @@ module pc_mux(pcmux, adder_out, bus, pc, pcmux_out);
                 pcmux_out = pc + 2;
             end
             2'b01: begin
-                pcmux_out = bus[15:0];
+                pcmux_out = bus;
             end
             2'b10: begin
                 pcmux_out = adder_out;
@@ -308,10 +309,14 @@ module pc_mux(pcmux, adder_out, bus, pc, pcmux_out);
 endmodule
 
 //////////loading registers//////////
-module ir_reg(ld_ir, bus, ir);
+module ir_reg(ld_ir, bus, ir_out);
     input ld_ir;
     input [15:0] bus;
-    output reg [15:0] ir;
+    output [15:0] ir_out;
+
+    reg [15:0] ir;
+
+    assign ir_out = ir;
 
     always_latch begin
         if(ld_ir) begin
@@ -320,7 +325,7 @@ module ir_reg(ld_ir, bus, ir);
     end
 endmodule
 
-module ben_reg(ldben, ir, cc, ben);
+module ben_reg(ldben, ir, cc, ben); 
     input ldben;
     input [15:0] ir;
     input [2:0] cc;
@@ -357,31 +362,43 @@ module cc_reg(ldcc, bus, cc);
     end
 endmodule
 
-module pc_reg(ldpc, pcmux_out, pc, start_pc, memory_initialized);
+module pc_reg(ldpc, pcmux_out, pc_out, start_pc, memory_initialized);
     input ldpc;
     input [15:0] pcmux_out;
     input [15:0] start_pc;
     input memory_initialized;
-    output reg [15:0] pc;
+    output [15:0] pc_out;
 
-    reg initialized = 0;
+    bit initialized;
+
+    reg [15:0] pc;
+
+    assign pc_out = pc;
+
+    initial begin
+        initialized = 0;
+    end
 
     always_latch begin
-        if(memory_initialized && !initialized) begin
+        if(!initialized && memory_initialized) begin
             pc = start_pc;
             initialized = 1;
         end
-
+        else
         if(ldpc) begin
             pc = pcmux_out;
         end
     end
 endmodule
 
-module mar_reg(ldmar, bus, mar);
+module mar_reg(ldmar, bus, mar_out);
     input ldmar;
     input [15:0] bus;
-    output reg [15:0] mar;
+    output [15:0] mar_out;
+
+    reg [15:0] mar;
+
+    assign mar_out = mar;
 
     always_latch begin
         if(ldmar) begin
@@ -390,10 +407,14 @@ module mar_reg(ldmar, bus, mar);
     end
 endmodule
 
-module mdr_reg(ldmdr, mioen_out, mdr);
+module mdr_reg(ldmdr, mioen_out, mdr_out);
     input ldmdr;
     input [15:0] mioen_out;
-    output reg [15:0] mdr;
+    output [15:0] mdr_out;
+
+    reg [15:0] mdr;
+
+    assign mdr_out = mdr;
 
     always_latch begin
         if(ldmdr) begin
