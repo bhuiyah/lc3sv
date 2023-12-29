@@ -22,7 +22,7 @@
 `include "enum_and_func.vh"
 import enum_and_pkg::*;
 
-module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r, start_pc, memory_initialized);
+module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r, start_pc, memory_initialized, pc);
     input clk;
     input [34:0] control_signals;
     input r;
@@ -38,6 +38,7 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     output ir11;
     output ben;
     output rw;
+    output [15:0] pc;
 
     //control signals from control store
     bit ldreg = control_signals[ld_reg_idx];
@@ -71,7 +72,7 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     wire [15:0] alu_out, shf_out, mdr_out, pc_out, marmux_out;
     wire [15:0] bus_contents;
     wire [15:0] A, B;
-    wire [15:0] pc, mar, mdr;
+    wire [15:0] mar, mdr;
     wire [2:0] cc;
     wire [15:0] addr1_out, addr2_out, lshf1_out, adder_out;
     wire [15:0] mdr_in_mioen_mux;
@@ -369,7 +370,7 @@ module pc_reg(ldpc, pcmux_out, pc_out, start_pc, memory_initialized);
     input memory_initialized;
     output [15:0] pc_out;
 
-    bit initialized;
+    reg initialized;
 
     reg [15:0] pc;
 
@@ -379,7 +380,7 @@ module pc_reg(ldpc, pcmux_out, pc_out, start_pc, memory_initialized);
         initialized = 0;
     end
 
-    always_latch begin
+    always@(*) begin
         if(!initialized && memory_initialized) begin
             pc = start_pc;
             initialized = 1;

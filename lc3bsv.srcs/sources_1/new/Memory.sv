@@ -41,6 +41,9 @@ module memory(cs, we, clk, rw, address, memory_bus, r, start_pc, memory_initiali
         int file;
         bit [15:0] word;
         bit [14:0] program_base;
+        
+        bit scanRet;
+        
         file = $fopen(filename, "r"); //open file for reading
         //read the first line of the file
 
@@ -54,7 +57,7 @@ module memory(cs, we, clk, rw, address, memory_bus, r, start_pc, memory_initiali
         //read the rest of the file
 
         while(!$feof(file)) begin
-            $fscanf(file, "%x\n", word);
+            scanRet = $fscanf(file, "%x\n", word);
             DRAM[program_base + i] = word;
             i = i + 1;
         end

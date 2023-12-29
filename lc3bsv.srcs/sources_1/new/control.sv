@@ -22,13 +22,14 @@
 `include "enum_and_func.vh"
 import enum_and_pkg::*;
 
-module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized);
+module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, current_pc);
     input clk;
     input r;
     input [3:0] opcode;
     input ir11;
     input ben;
     input memory_initialized;
+    input [15:0] current_pc;
     
     output bit [34:0] control_signals;
 
@@ -41,8 +42,12 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized);
 
     bit [34:0] control_store [63:0];
 
+    wire run_bit;
+
+    assign run_bit = memory_initialized && (current_pc != 16'h0000);
+
     initial begin
-        $readmemh("ucode3.mem", control_store);
+        $readmemb("ucode3.mem", control_store);
         state_number = 18;
     end
 
@@ -81,7 +86,7 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized);
     end
 
     always_comb begin
-        if(memory_initialized) begin
+        if(run_bit) begin
             
             // 1. first for loop lets arithmetic and logic occur
 
