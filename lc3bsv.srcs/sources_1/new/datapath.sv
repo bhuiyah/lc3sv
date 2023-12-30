@@ -385,9 +385,9 @@ module pc_reg(ldpc, pcmux_out, pc_out, start_pc, memory_initialized);
             pc = start_pc;
             initialized = 1;
         end
-        else
-        if(ldpc) begin
-            pc = pcmux_out;
+        else begin
+            if(ldpc)
+                pc = pcmux_out;
         end
     end
 endmodule

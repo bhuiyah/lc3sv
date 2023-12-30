@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="lc3_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="enum_and_pkg" />
+            <top_module name="glbl" />
+            <top_module name="lc3_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0 ps"></ZoomStartTime>
+      <ZoomEndTime time="17 ps"></ZoomEndTime>
+      <Cursor1Time time="1,000,000 ps"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="196"></NameColumnWidth>
+      <ValueColumnWidth column_width="236"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="7" />
+   <wvobject type="logic" fp_name="/lc3_tb/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/lc3_tb/lc3/cont/i">
+      <obj_property name="ElementShortName">i[5:0]</obj_property>
+      <obj_property name="ObjectShortName">i[5:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/lc3_tb/lc3/cont/state_number">
+      <obj_property name="ElementShortName">state_number[5:0]</obj_property>
+      <obj_property name="ObjectShortName">state_number[5:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/lc3_tb/lc3/cont/next_state_number">
+      <obj_property name="ElementShortName">next_state_number[5:0]</obj_property>
+      <obj_property name="ObjectShortName">next_state_number[5:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/lc3/ldmar">
+      <obj_property name="ElementShortName">ldmar</obj_property>
+      <obj_property name="ObjectShortName">ldmar</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/lc3/ldpc">
+      <obj_property name="ElementShortName">ldpc</obj_property>
+      <obj_property name="ObjectShortName">ldpc</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/lc3_tb/lc3/lc3/control_signals">
+      <obj_property name="ElementShortName">control_signals[34:0]</obj_property>
+      <obj_property name="ObjectShortName">control_signals[34:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+</wave_config>

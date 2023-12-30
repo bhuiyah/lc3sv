@@ -6,4 +6,35 @@ Using 8 slave threads.
 Starting static elaboration
 Pass Through NonSizing Optimizer
 Completed static elaboration
-INFO: [XSIM 43-4323] No Change in HDL. Linking previously generated obj files to create kernel
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package xil_defaultlib.enum_and_pkg
+Compiling module xil_defaultlib.memory
+Compiling module xil_defaultlib.register_file
+Compiling module xil_defaultlib.bus
+Compiling module xil_defaultlib.sr2_mux
+Compiling module xil_defaultlib.alu
+Compiling module xil_defaultlib.shf
+Compiling module xil_defaultlib.addr1_mux
+Compiling module xil_defaultlib.addr2_mux
+Compiling module xil_defaultlib.lshf1mod
+Compiling module xil_defaultlib.adder_for_marmux_or_pcmux
+Compiling module xil_defaultlib.mar_mux
+Compiling module xil_defaultlib.pc_mux
+Compiling module xil_defaultlib.ir_reg
+Compiling module xil_defaultlib.ben_reg
+Compiling module xil_defaultlib.cc_reg
+Compiling module xil_defaultlib.pc_reg
+Compiling module xil_defaultlib.mar_reg
+Compiling module xil_defaultlib.mdr_reg
+Compiling module xil_defaultlib.mdr_in_logic
+Compiling module xil_defaultlib.mio_en_mux
+Compiling module xil_defaultlib.mdr_out_logic
+Compiling module xil_defaultlib.we_logic
+Compiling module xil_defaultlib.datapath
+Compiling module xil_defaultlib.control
+Compiling module xil_defaultlib.LC3
+Compiling module xil_defaultlib.lc3_tb
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot lc3_tb_behav

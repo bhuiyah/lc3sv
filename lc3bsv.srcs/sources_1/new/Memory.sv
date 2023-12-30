@@ -42,7 +42,7 @@ module memory(cs, we, clk, rw, address, memory_bus, r, start_pc, memory_initiali
         bit [15:0] word;
         bit [14:0] program_base;
         
-        bit scanRet;
+        bit [31:0] scanRet;
         
         file = $fopen(filename, "r"); //open file for reading
         //read the first line of the file

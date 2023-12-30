@@ -36,13 +36,13 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, c
     bit[5:0] i;
     bit [5:0] state_number;
     bit [5:0] next_state_number;
-    bit [5:0] j;
-    bit [1:0] cond;
-    bit ird; 
+    wire run_bit; 
 
     bit [34:0] control_store [63:0];
 
-    wire run_bit;
+    bit  [5:0] j;
+    bit  [1:0] cond;
+    bit ird;
 
     assign run_bit = memory_initialized && (current_pc != 16'h0000);
 
@@ -51,18 +51,16 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, c
         state_number = 18;
     end
 
-    always@(posedge clk) begin
+    always_latch begin
         //microsequencer
         if(memory_initialized) begin
             ird = control_store[state_number][ird_idx];
             cond = {control_store[state_number][cond1_idx], control_store[state_number][cond0_idx]};
             j = {control_store[state_number][j5_idx], control_store[state_number][j4_idx], control_store[state_number][j3_idx], control_store[state_number][j2_idx], control_store[state_number][j1_idx], control_store[state_number][j0_idx]};
-            
             if(ird)
                 next_state_number = {2'b00, opcode};
             else begin
                 case(cond)
-
                     2'b00:
                         next_state_number = j;
 
@@ -77,11 +75,9 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, c
 
                 endcase
             end
-
-            state_number = next_state_number;
         end
         else begin
-            state_number = 18;
+            next_state_number = 18;
         end
     end
 
@@ -106,6 +102,10 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, c
         else begin
             control_signals = 35'b0;
         end
+    end
+
+    always@(posedge clk) begin
+        state_number <= next_state_number;
     end
 
 endmodule
