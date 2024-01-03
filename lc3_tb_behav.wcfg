@@ -5,29 +5,25 @@
    <db_ref_list>
       <db_ref path="lc3_tb_behav.wdb" id="1">
          <top_modules>
-            <top_module name="enum_and_pkg" />
             <top_module name="glbl" />
             <top_module name="lc3_tb" />
+            <top_module name="sign_extend" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0 ps"></ZoomStartTime>
-      <ZoomEndTime time="17 ps"></ZoomEndTime>
-      <Cursor1Time time="1,000,000 ps"></Cursor1Time>
+      <ZoomStartTime time="6,505 ps"></ZoomStartTime>
+      <ZoomEndTime time="6,574 ps"></ZoomEndTime>
+      <Cursor1Time time="500,000 ps"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="196"></NameColumnWidth>
-      <ValueColumnWidth column_width="236"></ValueColumnWidth>
+      <ValueColumnWidth column_width="212"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="7" />
+   <WVObjectSize size="23" />
    <wvobject type="logic" fp_name="/lc3_tb/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/lc3_tb/lc3/cont/i">
-      <obj_property name="ElementShortName">i[5:0]</obj_property>
-      <obj_property name="ObjectShortName">i[5:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/lc3_tb/lc3/cont/state_number">
       <obj_property name="ElementShortName">state_number[5:0]</obj_property>
@@ -37,17 +33,85 @@
       <obj_property name="ElementShortName">next_state_number[5:0]</obj_property>
       <obj_property name="ObjectShortName">next_state_number[5:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/lc3_tb/lc3/lc3/ldmar">
-      <obj_property name="ElementShortName">ldmar</obj_property>
-      <obj_property name="ObjectShortName">ldmar</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/lc3_tb/lc3/lc3/ldpc">
-      <obj_property name="ElementShortName">ldpc</obj_property>
-      <obj_property name="ObjectShortName">ldpc</obj_property>
-   </wvobject>
    <wvobject type="array" fp_name="/lc3_tb/lc3/lc3/control_signals">
       <obj_property name="ElementShortName">control_signals[34:0]</obj_property>
       <obj_property name="ObjectShortName">control_signals[34:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/lc3/memory_initialized">
+      <obj_property name="ElementShortName">memory_initialized</obj_property>
+      <obj_property name="ObjectShortName">memory_initialized</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/lc3/initialized">
+      <obj_property name="ElementShortName">initialized</obj_property>
+      <obj_property name="ObjectShortName">initialized</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/lc3_tb/lc3/lc3/pc">
+      <obj_property name="ElementShortName">pc[15:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/lc3/gate_en">
+      <obj_property name="ElementShortName">gate_en</obj_property>
+      <obj_property name="ObjectShortName">gate_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/lc3/load_en">
+      <obj_property name="ElementShortName">load_en</obj_property>
+      <obj_property name="ObjectShortName">load_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/mem/cs">
+      <obj_property name="ElementShortName">cs</obj_property>
+      <obj_property name="ObjectShortName">cs</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/lc3_tb/lc3/mem/we">
+      <obj_property name="ElementShortName">we[1:0]</obj_property>
+      <obj_property name="ObjectShortName">we[1:0]</obj_property>
       <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/mem/rw">
+      <obj_property name="ElementShortName">rw</obj_property>
+      <obj_property name="ObjectShortName">rw</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/lc3_tb/lc3/mem/address">
+      <obj_property name="ElementShortName">address[15:0]</obj_property>
+      <obj_property name="ObjectShortName">address[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/mem/r">
+      <obj_property name="ElementShortName">r</obj_property>
+      <obj_property name="ObjectShortName">r</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/lc3_tb/lc3/mem/cycle_count">
+      <obj_property name="ElementShortName">cycle_count[3:0]</obj_property>
+      <obj_property name="ObjectShortName">cycle_count[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/lc3/we_l/rw">
+      <obj_property name="ElementShortName">rw</obj_property>
+      <obj_property name="ObjectShortName">rw</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/lc3/we_l/mar0">
+      <obj_property name="ElementShortName">mar0</obj_property>
+      <obj_property name="ObjectShortName">mar0</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/lc3/we_l/data_size">
+      <obj_property name="ElementShortName">data_size</obj_property>
+      <obj_property name="ObjectShortName">data_size</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/mem/cs">
+      <obj_property name="ElementShortName">cs</obj_property>
+      <obj_property name="ObjectShortName">cs</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/lc3_tb/lc3/mem/data_out">
+      <obj_property name="ElementShortName">data_out[15:0]</obj_property>
+      <obj_property name="ObjectShortName">data_out[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/mem/r">
+      <obj_property name="ElementShortName">r</obj_property>
+      <obj_property name="ObjectShortName">r</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/lc3_tb/lc3/cont/run_bit">
+      <obj_property name="ElementShortName">run_bit</obj_property>
+      <obj_property name="ObjectShortName">run_bit</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/lc3_tb/lc3/lc3/mdr_r/mdr">
+      <obj_property name="ElementShortName">mdr[15:0]</obj_property>
+      <obj_property name="ObjectShortName">mdr[15:0]</obj_property>
    </wvobject>
 </wave_config>

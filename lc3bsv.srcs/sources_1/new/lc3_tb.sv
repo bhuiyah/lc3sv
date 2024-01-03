@@ -22,9 +22,15 @@
 
 module lc3_tb;
 
-    reg clk = 0;
+    reg clk;
 
-    always #5 clk = ~clk;
+    initial begin
+        clk = 0;
+    end
+
+    always begin
+        #0.5 clk = ~clk;
+    end
 
     LC3 lc3(.CLK(clk));
 

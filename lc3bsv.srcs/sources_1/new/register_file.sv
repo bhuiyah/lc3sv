@@ -45,6 +45,7 @@ module register_file(clk, reg_write, DR, SR1, SR2, Reg_In, ReadReg1, ReadReg2);
     always@(posedge clk) begin
         if(reg_write == 1) begin
             reg_file[DR] <= Reg_In;
+            $display("Register %d written with value %h", DR, Reg_In);
         end
 
         ReadReg1 <= reg_file[SR1];

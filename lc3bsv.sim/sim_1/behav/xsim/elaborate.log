@@ -9,7 +9,7 @@ Completed static elaboration
 Starting simulation data flow analysis
 Completed simulation data flow analysis
 Time Resolution for simulation is 1ps
-Compiling package xil_defaultlib.enum_and_pkg
+Compiling package xil_defaultlib.sign_extend
 Compiling module xil_defaultlib.memory
 Compiling module xil_defaultlib.register_file
 Compiling module xil_defaultlib.bus

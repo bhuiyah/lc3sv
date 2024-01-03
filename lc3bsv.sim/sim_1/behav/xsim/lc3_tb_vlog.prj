@@ -1,5 +1,5 @@
 # compile verilog/system verilog design source files
-sv xil_defaultlib  --include "../../../../lc3bsv.srcs/sources_1/new" \
+sv xil_defaultlib  \
 "../../../../lc3bsv.srcs/sources_1/new/LC3.sv" \
 "../../../../lc3bsv.srcs/sources_1/new/control.sv" \
 "../../../../lc3bsv.srcs/sources_1/new/datapath.sv" \

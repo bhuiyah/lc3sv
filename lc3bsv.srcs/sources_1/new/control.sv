@@ -19,8 +19,8 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-`include "enum_and_func.vh"
-import enum_and_pkg::*;
+`include "sign_extend.vh"
+import sign_extend::*;
 
 module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, current_pc);
     input clk;
@@ -31,9 +31,9 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, c
     input memory_initialized;
     input [15:0] current_pc;
     
-    output bit [34:0] control_signals;
+    output reg [34:0] control_signals;
 
-    bit[5:0] i;
+    integer i;
     bit [5:0] state_number;
     bit [5:0] next_state_number;
     wire run_bit; 
@@ -49,14 +49,15 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, c
     initial begin
         $readmemb("ucode3.mem", control_store);
         state_number = 18;
+        control_signals = control_store[state_number];
     end
 
     always_latch begin
         //microsequencer
-        if(memory_initialized) begin
-            ird = control_store[state_number][ird_idx];
-            cond = {control_store[state_number][cond1_idx], control_store[state_number][cond0_idx]};
-            j = {control_store[state_number][j5_idx], control_store[state_number][j4_idx], control_store[state_number][j3_idx], control_store[state_number][j2_idx], control_store[state_number][j1_idx], control_store[state_number][j0_idx]};
+        if(run_bit) begin
+            ird = control_store[state_number][34];
+            cond = control_store[state_number][33:32];
+            j = control_store[state_number][31:26];
             if(ird)
                 next_state_number = {2'b00, opcode};
             else begin
@@ -81,32 +82,19 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, c
         end
     end
 
-    always_comb begin
+    always@(posedge clk) begin
+        state_number = next_state_number;
         if(run_bit) begin
-            
-            // 1. first for loop lets arithmetic and logic occur
-
-            for(i = pcmux1_idx; i < control_store_bits; i = i + 1)
-                control_signals[i] = control_store[state_number][i];
-
-            // 2. second for loop loads any value from arithmetic/logic to the bus
-
-            for(i = gate_pc_idx; i < pcmux1_idx; i = i + 1)
-                control_signals[i] = control_store[state_number][i];
-
-            // 3. third for loop loads any value from the bus to a register in datapath
-
-            for(i = ld_mar_idx; i < gate_pc_idx; i = i + 1)
-                control_signals[i] = control_store[state_number][i];
+            control_signals = control_store[state_number];
         end
         else begin
             control_signals = 35'b0;
         end
     end
 
-    always@(posedge clk) begin
-        state_number <= next_state_number;
-    end
+    // always @(negedge run_bit) begin
+    //     $stop;  // Stop the simulation
+    // end
 
 endmodule
 

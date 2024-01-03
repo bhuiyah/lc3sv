@@ -37,8 +37,34 @@ wire [15:0] start_pc;
 wire memory_initialized;
 wire [15:0] current_pc;
 
+reg gate_en;
+reg load_en;
+
 memory mem(.cs(cs), .we(we), .clk(CLK), .rw(rw), .address(address), .memory_bus(memory_bus), .r(r), .start_pc(start_pc), .memory_initialized(memory_initialized));
-datapath lc3(.clk(CLK), .cs(cs), .we(we), .address(address), .memory_bus(memory_bus), .control_signals(control_signals), .opcode(opcode), .ir11(ir11), .ben(ben), .rw(rw), .r(r), .start_pc(start_pc), .memory_initialized(memory_initialized), .pc(current_pc));
+datapath lc3(.clk(CLK), .cs(cs), .we(we), .address(address), .memory_bus(memory_bus), .control_signals(control_signals), .opcode(opcode), .ir11(ir11), .ben(ben), .rw(rw), .r(r), .start_pc(start_pc), .memory_initialized(memory_initialized), .pc(current_pc), .gate_en(gate_en), .load_en(load_en));
 control cont(.clk(CLK), .r(r), .opcode(opcode), .ir11(ir11), .ben(ben), .control_signals(control_signals), .memory_initialized(memory_initialized), .current_pc(current_pc));
+
+initial begin
+    gate_en = 0;
+    load_en = 0;
+    #0.1;
+    gate_en = 1;
+    #0.1; 
+    gate_en = 0;
+    #0.1;
+    load_en = 1;
+end
+
+//scheduler
+always @(posedge CLK) begin
+    gate_en = 0;
+    load_en = 0;
+    #0.1;
+    gate_en = 1;
+    #0.1; 
+    gate_en = 0;
+    #0.1;
+    load_en = 1;
+end
 
 endmodule

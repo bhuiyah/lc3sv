@@ -26,7 +26,7 @@ module memory(cs, we, clk, rw, address, memory_bus, r, start_pc, memory_initiali
     input rw;
     input [15:0] address;
     inout [15:0] memory_bus;
-    output r;
+    output reg r;
     output reg [15:0] start_pc;
     output reg memory_initialized;
 
@@ -69,7 +69,6 @@ module memory(cs, we, clk, rw, address, memory_bus, r, start_pc, memory_initiali
     endtask
     
     assign memory_bus = ((cs == 0) || (we == 1)) ? 16'bZ : data_out;
-    assign r = (cycle_count == 5);
     assign acc_addr = address[15:1];
 
     initial begin
@@ -77,24 +76,27 @@ module memory(cs, we, clk, rw, address, memory_bus, r, start_pc, memory_initiali
             
         load_program("test.mem", DRAM, start_pc, memory_initialized);
         cycle_count = 0;
+        r = 0;
     end
 
-    always@(negedge clk) begin
+    always@(posedge clk) begin
         //write to memory
+        r = 0;
         if(cs) begin //cs = mio_en
-            if(cycle_count == 5) begin //5 cycles to read or write to DRAM
+            if(cycle_count == 4) begin //5 cycles to read or write to DRAM
                 if(rw) begin //write
                     if(we[0])
-                        DRAM[acc_addr][7:0] <= memory_bus[7:0];
+                        DRAM[acc_addr][7:0] = memory_bus[7:0];
 
                     if(we[1])
-                        DRAM[acc_addr][15:8] <= memory_bus[15:8];
+                        DRAM[acc_addr][15:8] = memory_bus[15:8];
                 end
                 else //read
-                    data_out <= DRAM[acc_addr];
-                cycle_count <= 0; //reset cycle count after accessing DRAM
+                    data_out = DRAM[acc_addr];
+                r = 1;
+                cycle_count = 0; //reset cycle count after accessing DRAM
             end else
-                cycle_count <= cycle_count + 1;
+                cycle_count = cycle_count + 1;
         end
     end
 endmodule
