@@ -1,0 +1,35 @@
+Time resolution is 1 ps
+pc = 0011000000000000
+bus_contents = 0011000000000000
+pc = 0011000000000010
+mar = 0011000000000000
+mdr = 0101000000100000
+bus_contents = 0101000000100000
+ir = 0101000000100000
+ben = 0
+bus_contents = 0000000000000000
+cc = 010
+Register 0 written with value 0000
+bus_contents = 0011000000000010
+pc = 0011000000000100
+mar = 0011000000000010
+mdr = 1111000000100101
+bus_contents = 1111000000100101
+ir = 1111000000100101
+ben = 0
+bus_contents = 0000000001001010
+mar = 0000000001001010
+bus_contents = 0011000000000100
+Register 7 written with value 3004
+bus_contents = 0011000000000100
+Register 7 written with value 3004
+bus_contents = 0011000000000100
+Register 7 written with value 3004
+bus_contents = 0011000000000100
+Register 7 written with value 3004
+bus_contents = 0011000000000100
+mdr = 0000000000000000
+Register 7 written with value 3004
+bus_contents = 0000000000000000
+pc = 0000000000000000
+INFO: xsimkernel Simulation Memory Usage: 1322220 KB (Peak: 1370184 KB), Simulation CPU Usage: 100 ms

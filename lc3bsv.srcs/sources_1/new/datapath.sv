@@ -112,7 +112,7 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     cc_reg cc_r(.ldcc(ldcc), .bus(bus_contents), .cc(cc), .load_en(load_en));
     pc_reg pc_r(.ldpc(ldpc), .pcmux_out(pcmux_out), .pc_out(pc), .start_pc(start_pc), .memory_initialized(memory_initialized), .initialized(initialized), .load_en(load_en));
     mar_reg mar_r(.ldmar(ldmar), .bus(bus_contents), .mar_out(mar), .load_en(load_en));
-    mdr_reg mdr_r(.ldmdr(ldmdr), .mioen_out(mioen_out), .mdr_out(mdr), .load_en(load_en));
+    mdr_reg mdr_r(.ldmdr(ldmdr), .mioen_out(mioen_out), .mdr_out(mdr), .load_en(load_en), .r(r));
 
     //memory management
     mdr_in_logic mdr_in(.bus(bus_contents), .data_size(data_size), .mdr_in_mioen_mux(mdr_in_mioen_mux));
@@ -425,10 +425,11 @@ module mar_reg(ldmar, bus, mar_out, load_en);
     end
 endmodule
 
-module mdr_reg(ldmdr, mioen_out, mdr_out, load_en);
+module mdr_reg(ldmdr, mioen_out, mdr_out, load_en, r);
     input ldmdr;
     input [15:0] mioen_out;
     input load_en;
+    input r;
     output [15:0] mdr_out;
 
     reg [15:0] mdr;
@@ -436,7 +437,7 @@ module mdr_reg(ldmdr, mioen_out, mdr_out, load_en);
     assign mdr_out = mdr;
 
     always@(posedge load_en) begin
-        if(ldmdr) begin
+        if(ldmdr && r) begin
             mdr = mioen_out;
             $display("mdr = %b", mdr);
         end
