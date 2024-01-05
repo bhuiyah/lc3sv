@@ -89,10 +89,11 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     assign rw = control_signals[2];
     assign ir11 = instruction[11];
     assign mdr_val_from_mem = (mio_en && !rw && r) ? memory_bus : 16'h0000;
+    assign memory_bus = (mio_en && rw) ? mdr_out : 16'hZZZZ;
     assign A = readreg1;
     assign address = mar;
     assign initialized = (pc == start_pc) || pc != 16'h0000;
-
+    
     //wiring the datapath
     register_file reg_file(.clk(clk), .reg_write(ldreg), .DR(dr), .SR1(sr1), .SR2(sr2), .Reg_In(bus_contents), .ReadReg1(readreg1), .ReadReg2(readreg2));
     bus b_u_s(.alu_out(alu_out), .shf_out(shf_out), .mdr_out(mdr_out), .pc_out(pc), .marmux_out(marmux_out), .gatealu(gatealu), .gateshf(gateshf), .gatemdr(gatemdr), .gatepc(gatepc), .gatemarmux(gatemarmux), .bus_contents(bus_contents), .gate_en(gate_en));

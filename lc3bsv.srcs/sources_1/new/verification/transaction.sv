@@ -27,11 +27,7 @@ class transaction;
     rand bit [15:0] address;
     rand bit [15:0] memory_bus;
 
-    bit r;
-    bit [15:0] start_pc;
-    bit memory_initialized;
-
-    constraint c1 { address >= 16'h0000; }
+    constraint c1 { address > 16'h0000; }
     constraint c2 { address <= 16'h7FFF; }
 
     // post_randomize() is called after randomization is complete
@@ -43,6 +39,18 @@ class transaction;
         $display("address = %h", address);
         $display("memory_bus = %h", memory_bus);
         $display("--------------------------------------------");
+    endfunction
+
+    //deep copy constructor
+    function transaction deep_copy();
+        transaction tr_deep_copy;
+        tr_deep_copy = new();
+        tr_deep_copy.cs = this.cs;
+        tr_deep_copy.we = this.we;
+        tr_deep_copy.rw = this.rw;
+        tr_deep_copy.address = this.address;
+        tr_deep_copy.memory_bus = this.memory_bus;
+        return tr_deep_copy;
     endfunction
 
 endclass

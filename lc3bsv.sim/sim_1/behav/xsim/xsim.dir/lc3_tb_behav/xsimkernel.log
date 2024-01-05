@@ -1,7 +1,0 @@
-Running: xsim.dir/lc3_tb_behav/xsimk -simmode gui -wdb lc3_tb_behav.wdb -simrunnum 0 -socket 38331
-Design successfully loaded
-Design Loading Memory Usage: 1230904 KB (Peak: 1230904 KB)
-Design Loading CPU Usage: 80 ms
-Simulation completed
-Simulation Memory Usage: 1322220 KB (Peak: 1370184 KB)
-Simulation CPU Usage: 100 ms
