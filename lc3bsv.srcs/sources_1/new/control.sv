@@ -31,7 +31,7 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, c
     input memory_initialized;
     input [15:0] current_pc;
     
-    output reg [34:0] control_signals;
+    output reg [25:0] control_signals;
 
     integer i;
     bit [5:0] state_number;
@@ -47,9 +47,9 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, c
     assign run_bit = memory_initialized && (current_pc != 16'h0000);
 
     initial begin
-        $readmemb("ucode3.mem", control_store);
+        $readmemb("cs.mem", control_store);
         state_number = 18;
-        control_signals = control_store[state_number];
+        control_signals = control_store[state_number][25:0];
     end
 
     always_latch begin
@@ -85,16 +85,12 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, c
     always@(posedge clk) begin
         state_number = next_state_number;
         if(run_bit) begin
-            control_signals = control_store[state_number];
+            control_signals = control_store[state_number][25:0];
         end
         else begin
-            control_signals = 35'b0;
+            control_signals = 26'b0;
         end
     end
-
-    // always @(negedge run_bit) begin
-    //     $stop;  // Stop the simulation
-    // end
 
 endmodule
 

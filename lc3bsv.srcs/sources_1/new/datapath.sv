@@ -18,13 +18,14 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
+`define Low16bits(x) x & 16'hFFFF
 
 `include "sign_extend.vh"
 import sign_extend::*;
 
 module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r, start_pc, memory_initialized, pc, gate_en, load_en);
     input clk;
-    input [34:0] control_signals;
+    input [25:0] control_signals;
     input r;
     input [15:0] start_pc;
     input memory_initialized;
@@ -196,17 +197,17 @@ module shf(A, ir5_4, ammt4, shf_out);
         A_sext = sext(A, 16);
         case(ir5_4)
             2'b00: begin
-                shf_out = (A << ammt4) & 16'hFFFF;
+                shf_out = `Low16bits(A << ammt4);
             end
             2'b01: begin
-                shf_out = (A >> ammt4) & 16'hFFFF;
+                shf_out = `Low16bits(A >> ammt4);
             end
             2'b10: begin
                 //will be skipped
                 shf_out = A;
             end
             2'b11: begin
-                shf_out = (A_sext >> ammt4) & 16'hFFFF;
+                shf_out = `Low16bits(A_sext >> ammt4);
             end
             default: begin
                 shf_out = A;
@@ -222,8 +223,12 @@ module sr2_mux(sr2muxsignal, readreg2, imm5, sr2_out);
     input [4:0] imm5;
     output reg [15:0] sr2_out;
 
+    reg [15:0] sexted_imm5;
+
     always_comb begin
-        sr2_out = sr2muxsignal ? sext({11'h000, imm5}, 5) : readreg2;
+        sexted_imm5 = sext({11'h000, imm5}, 5);
+        assert(sexted_imm5 < 15 && sexted_imm5 > -16) else $error("Invalid imm5");
+        sr2_out = sr2muxsignal ? sexted_imm5 : readreg2;  
     end
 
 endmodule
@@ -250,14 +255,16 @@ module addr2_mux(addr2mux, ir, addr2_out);
                 addr2_out = 16'h0000;
             end
             2'b01: begin
-                //ir[5:0] is sexted to 16 bits
                 addr2_out = sext({10'h000, ir[5:0]}, 6);
+                assert(addr2_out < 32 && addr2_out > -33) else $error("Invalid imm");
             end
             2'b10: begin
                 addr2_out = sext({7'h00, ir[8:0]}, 9);
+                assert(addr2_out < 256 && addr2_out > -257) else $error("Invalid imm");
             end
             2'b11: begin
                 addr2_out = sext({5'h00, ir[10:0]}, 11);
+                assert(addr2_out < 2048 && addr2_out > -2049) else $error("Invalid imm");
             end
         endcase
     end
@@ -335,6 +342,8 @@ module ir_reg(ld_ir, bus, ir_out, load_en);
         if(ld_ir) begin
             ir = bus[15:0];
             $display("ir = %b", ir);
+            //opcode cant be 8(RTI isn't implemented yet), 10, or 11 (invalid opcodes)
+            assert(ir[15:12] != 8 && ir[15:12] != 10 && ir[15:12] != 11) else $error("Invalid opcode");
         end
     end
 endmodule
@@ -376,6 +385,7 @@ module cc_reg(ldcc, bus, cc, load_en);
         if(ldcc) begin
             cc = n ? 3'b100 : (z ? 3'b010 : (p ? 3'b001 : 3'b000));
             $display("cc = %b", cc);
+            assert(cc == 3'b100 || cc == 3'b010 || cc == 3'b001) else $error("Invalid cc");
         end
     end
 endmodule
@@ -397,6 +407,7 @@ module pc_reg(ldpc, pcmux_out, pc_out, start_pc, memory_initialized, initialized
         if(ldpc) begin
             pc = pcmux_out;
             $display("pc = %b", pc);
+            assert(pc != 16'h0000) else $error("Program finished execution");
         end
     end
 
