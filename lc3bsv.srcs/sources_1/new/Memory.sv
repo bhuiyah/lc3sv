@@ -44,6 +44,17 @@ module memory(cs, we, clk, rw, address, memory_bus
     
     bit [15:0] DRAM [16'h08000];
 
+    //SRAM cache, 4B cache line, 4-way set associative, 8 sets
+    //11b tag, 3b index, 2b offset
+    //1b valid, 1b dirty, 2b lru, 32b data
+
+    // | 11b tag | 1b valid | 1b dirty | 2b lru | 32b data |
+    // 4 ways per set, 8 sets
+    bit [46:0] cache_way0 [7:0];
+    bit [46:0] cache_way1 [7:0];
+    bit [46:0] cache_way2 [7:0];
+    bit [46:0] cache_way3 [7:0];
+
     `ifdef SIMULATE_CPU
         task automatic load_program(input string filename, ref bit [15:0] DRAM [16'h08000], output [15:0] start_pc, output bit memory_initialized);
             bit [14:0] i;
