@@ -25,12 +25,12 @@ module memory(cs, we, clk, rw, address, memory_bus
     `endif
     );
 
-    input cs;
-    input[1:0] we;
+    input cs; // chip select
+    input[1:0] we; // write enable
     input clk;
-    input rw;
-    input [15:0] address;
-    inout [15:0] memory_bus;
+    input rw; // read/write
+    input [15:0] address; // address to read/write
+    inout [15:0] memory_bus; //memory bus holding mem data
 
     `ifdef SIMULATE_CPU
         output r;
@@ -40,16 +40,16 @@ module memory(cs, we, clk, rw, address, memory_bus
 
     wire cache_miss;
 
+    SRAM sram(.cs(cs), .we(we), .clk(clk), .rw(rw), .address(address), .memory_bus(memory_bus) 
+    `ifdef SIMULATE_CPU
+        , .r(r), .memory_initialized(memory_initialized)
+    `endif
+    , .cache_miss(cache_miss)
+    );
+
     DRAM dram(.cs(cs), .we(we), .clk(clk), .rw(rw), .address(address), .memory_bus(memory_bus) 
         `ifdef SIMULATE_CPU
             , .r(r), .start_pc(start_pc), .memory_initialized(memory_initialized)
-        `endif
-        , .cache_miss(cache_miss)
-    );
-    
-    SRAM sram(.cs(cs), .we(we), .clk(clk), .rw(rw), .address(address), .memory_bus(memory_bus) 
-        `ifdef SIMULATE_CPU
-            , .r(r), .memory_initialized(memory_initialized)
         `endif
         , .cache_miss(cache_miss)
     );
