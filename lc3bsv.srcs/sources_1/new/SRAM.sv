@@ -31,9 +31,9 @@ typedef enum {
 
 module SRAM(cs, we, clk, rw, address, memory_bus
     `ifdef SIMULATE_CPU
-        , r, memory_initialized
+        , r_mem, r_cache
     `endif
-        , cache_miss
+        , cache_hit, mem_en
     );
 
     input cs;
@@ -41,14 +41,15 @@ module SRAM(cs, we, clk, rw, address, memory_bus
     input clk;
     input rw;
     input [15:0] address;
-    inout [15:0] memory_bus;
+    inout [31:0] memory_bus;
 
     `ifdef SIMULATE_CPU
-        output reg r;
-        output reg memory_initialized;
+        input r_mem;
+        output reg r_cache;
     `endif
 
     output reg cache_hit;
+    output reg mem_en;
 
     //SRAM cache, 4B cache line, 4-way set associative, 8 sets
     //11b tag, 3b index, 2b offset
@@ -64,16 +65,19 @@ module SRAM(cs, we, clk, rw, address, memory_bus
     bit [46:0] cache_way3 [7:0];
 
     reg [15:0] data_out;
-    reg [3:0] cycle_count;
     reg [14:0] acc_addr;
 
     bit [1:0] hit_way;
+    bit empty;
+    bit empty_way;
+    bit [1:0] lru_way;
 
     integer i;
 
-    states state, next_state;
+    reg [3:0] state;
+    reg [3:0] next_state;
 
-    assign memory_bus = ((cs == 0) || (we == 1) || (cache_miss)) ? 16'bZ : data_out;
+    assign memory_bus = ((cs == 0) || (we == 1) || !(cache_hit)) || (mem_en) ? 32'bZ : {16'bZ, data_out};
     assign acc_addr = address[15:1];
 
 
@@ -98,15 +102,87 @@ module SRAM(cs, we, clk, rw, address, memory_bus
         end
     endtask
 
+    task automatic read_cache(input bit [1:0] hit_way, output reg [15:0] data_out);
+        //only read data if cache hit
+        if(hit_way == 0) begin
+            if(`addr_offset == 0 || `addr_offset == 1) begin
+                //lower half of data, 16 bits
+                data_out = cache_way0[`addr_idx][15:0];
+            end
+            else if(`addr_offset == 2 || `addr_offset == 3) begin
+                //upper half of data, 16 bits
+                data_out = cache_way0[`addr_idx][31:16];
+            end
+        end
+        else if(hit_way == 1) begin
+            if(`addr_offset == 0 || `addr_offset == 1) begin
+                //lower half of data, 16 bits
+                data_out = cache_way1[`addr_idx][15:0];
+            end
+            else if(`addr_offset == 2 || `addr_offset == 3) begin
+                //upper half of data, 16 bits
+                data_out = cache_way1[`addr_idx][31:16];
+            end
+        end
+        else if(hit_way == 2) begin
+            if(`addr_offset == 0 || `addr_offset == 1) begin
+                //lower half of data, 16 bits
+                data_out = cache_way2[`addr_idx][15:0];
+            end
+            else if(`addr_offset == 2 || `addr_offset == 3) begin
+                //upper half of data, 16 bits
+                data_out = cache_way2[`addr_idx][31:16];
+            end
+        end
+        else if(hit_way == 3) begin
+            if(`addr_offset == 0 || `addr_offset == 1) begin
+                //lower half of data, 16 bits
+                data_out = cache_way3[`addr_idx][15:0];
+            end
+            else if(`addr_offset == 2 || `addr_offset == 3) begin
+                //upper half of data, 16 bits
+                data_out = cache_way3[`addr_idx][31:16];
+            end
+        end
+    endtask
 
-    inital begin
+    task automatic cache_empty(output bit empty, output bit [1:0] way);
+        //check if cache is empty by checking tag bits
+
+    endtask
+
+    task automatic find_lru(output bit [1:0] lru_way);
+        //find the least recently used way in the set
+        if({cache_way0['addr_idx][33], cache_way0['addr_idx][32]} == 2'b11) begin
+            lru_way = 0;
+        end
+        else if({cache_way1['addr_idx][33], cache_way1['addr_idx][32]} == 2'b11) begin
+            lru_way = 1;
+        end
+        else if({cache_way2['addr_idx][33], cache_way2['addr_idx][32]} == 2'b11) begin
+            lru_way = 2;
+        end
+        else if({cache_way3['addr_idx][33], cache_way3['addr_idx][32]} == 2'b11) begin
+            lru_way = 3;
+        end
+
+    endtask
+
+    initial begin
         state = IDLE;
         next_state = IDLE;
-        cache_miss = 0;
-        cycle_count = 0;
+        cache_hit = 0;
+        mem_en = 0;
+        hit_way = 0;
+        //initialize cache
+        for(i = 0; i < 8; i = i + 1) begin
+            cache_way0[i] = 0;
+            cache_way1[i] = 0;
+            cache_way2[i] = 0;
+            cache_way3[i] = 0;
+        end
         `ifdef SIMULATE_CPU
-            r = 0;
-            memory_initialized = 0;
+            r_cache = 0;
         `endif
     end
 
@@ -114,8 +190,7 @@ module SRAM(cs, we, clk, rw, address, memory_bus
         case(state)
             IDLE: begin
                 //wait until mio_en/cs is high meaning we want to access memory
-                if(cs && !cache_miss) begin
-                    cycle_count = 0;
+                if(cs && !cache_hit && !mem_en) begin
                     if(rw) begin
                         next_state = READ;
                     end
@@ -131,17 +206,10 @@ module SRAM(cs, we, clk, rw, address, memory_bus
                 //check if address is in cache
                 check_cache(cache_hit, hit_way);
                 if(cache_hit) begin
-                    if(`addr_offset == 0 || `addr_offset == 1) begin
-                        //lower half of data, 16 bits
-                        data_out = cache_way0[hit_way][15:0];
-                    end
-                    else if(`addr_offset == 2 || `addr_offset == 3) begin
-                        //upper half of data, 16 bits
-                        data_out = cache_way0[hit_way][31:16];
-                    end
+                    read_cache(hit_way, data_out);
 
                     `ifdef SIMULATE_CPU
-                        r = 1;
+                        r_cache = 1;
                     `endif
 
                     next_state = IDLE;
@@ -151,20 +219,89 @@ module SRAM(cs, we, clk, rw, address, memory_bus
                 end
             end
             READMISS: begin
+                mem_en = 1; //cache miss so need to access main memory
                 next_state = READMEM;
             end
             READMEM: begin
-                next_state = READDATA;
+                //wait 5 cycles to read from memory
+                if(r_mem) begin //r_mem is 1 when data is ready from main memory
+                    next_state = READDATA;
+                end
+                else begin //wait for data to be ready
+                    next_state = READMEM;
+                end
             end
             READDATA: begin
-                next_state = IDLE;
-            end
-            WRITE: begin
-                if(cache_miss) begin
-                    next_state = WRITEMISS;
+                //write data to cache and update lru bits
+                //check if cache has an empty way
+                cache_empty(empty, empty_way);
+                if(empty) begin
+                    //write to empty way
+                    case(empty_way)
+                        2'b00: begin
+                            cache_way0[`addr_idx] = {`addr_tag, 1'b1, 1'b0, 2'b00, memory_bus};
+                        end
+                        2'b01: begin
+                            cache_way1[`addr_idx] = {`addr_tag, 1'b1, 1'b0, 2'b00, memory_bus};
+                        end
+                        2'b10: begin
+                            cache_way2[`addr_idx] = {`addr_tag, 1'b1, 1'b0, 2'b00, memory_bus};
+                        end
+                        2'b11: begin
+                            cache_way3[`addr_idx] = {`addr_tag, 1'b1, 1'b0, 2'b00, memory_bus};
+                        end
+                    endcase
                 end
                 else begin
-                    next_state = WRITEDATA;
+                    //need to evict a way
+                    find_lru(lru_way);
+                    case(lru_way)
+                        2'b00: begin
+                            //check if dirty bit is set
+                            if(cache_way0[`addr_idx][`dirty_bit]) begin
+                                //write dirty data back to memory
+                                //need to implement write back policy
+                                //gonna go to a state where we write back to memory
+                            end
+
+                            cache_way0[`addr_idx] = {`addr_tag, 1'b1, 1'b0, 2'b00, memory_bus};
+                            //update lru bits for other ways
+                            cache_way1[`addr_idx][33:32] = cache_way1[`addr_idx][33:32] + 1;
+                            cache_way2[`addr_idx][33:32] = cache_way2[`addr_idx][33:32] + 1;
+                            cache_way3[`addr_idx][33:32] = cache_way3[`addr_idx][33:32] + 1;
+                        end
+                        2'b01: begin
+                            cache_way1[`addr_idx] = {`addr_tag, 1'b1, 1'b0, 2'b00, memory_bus};
+                            //update lru bits for other ways
+                            cache_way0[`addr_idx][33:32] = cache_way0[`addr_idx][33:32] + 1;
+                            cache_way2[`addr_idx][33:32] = cache_way2[`addr_idx][33:32] + 1;
+                            cache_way3[`addr_idx][33:32] = cache_way3[`addr_idx][33:32] + 1;
+                        end
+                        2'b10: begin
+                            cache_way2[`addr_idx] = {`addr_tag, 1'b1, 1'b0, 2'b00, memory_bus};
+                            //update lru bits for other ways
+                            cache_way0[`addr_idx][33:32] = cache_way0[`addr_idx][33:32] + 1;
+                            cache_way1[`addr_idx][33:32] = cache_way1[`addr_idx][33:32] + 1;
+                            cache_way3[`addr_idx][33:32] = cache_way3[`addr_idx][33:32] + 1;
+                        end
+                        2'b11: begin
+                            cache_way3[`addr_idx] = {`addr_tag, 1'b1, 1'b0, 2'b00, memory_bus};
+                            //update lru bits for other ways
+                            cache_way0[`addr_idx][33:32] = cache_way0[`addr_idx][33:32] + 1;
+                            cache_way1[`addr_idx][33:32] = cache_way1[`addr_idx][33:32] + 1;
+                            cache_way2[`addr_idx][33:32] = cache_way2[`addr_idx][33:32] + 1;
+                        end
+                    endcase
+                end
+            end
+            WRITE: begin
+                //check if address is in cache
+                check_cache(cache_hit, hit_way);
+                if(cache_hit) begin
+                    next_state = WRITEHIT;
+                end
+                else begin
+                    next_state = WRITEMISS;
                 end
             end
             WRITEMISS: begin

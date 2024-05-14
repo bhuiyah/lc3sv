@@ -33,25 +33,27 @@ module memory(cs, we, clk, rw, address, memory_bus
     inout [15:0] memory_bus; //memory bus holding mem data
 
     `ifdef SIMULATE_CPU
-        output r;
+        output r_cache;
+        output r_mem;
         output [15:0] start_pc;
         output memory_initialized;
     `endif
 
-    wire cache_miss;
+    wire cache_hit;
+    wire mem_en;
 
     SRAM sram(.cs(cs), .we(we), .clk(clk), .rw(rw), .address(address), .memory_bus(memory_bus) 
     `ifdef SIMULATE_CPU
-        , .r(r), .memory_initialized(memory_initialized)
+        , .r_cache(r_cache), .r_mem(r_mem)
     `endif
-    , .cache_miss(cache_miss)
+    , .cache_hit(cache_hit), .mem_en(mem_en)
     );
 
     DRAM dram(.cs(cs), .we(we), .clk(clk), .rw(rw), .address(address), .memory_bus(memory_bus) 
         `ifdef SIMULATE_CPU
-            , .r(r), .start_pc(start_pc), .memory_initialized(memory_initialized)
+            , .r_mem(r_mem), .start_pc(start_pc), .memory_initialized(memory_initialized)
         `endif
-        , .cache_miss(cache_miss)
+        , .cache_miss(cache_hit), .mem_en(mem_en)
     );
 
 endmodule

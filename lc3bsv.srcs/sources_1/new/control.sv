@@ -22,9 +22,10 @@
 `include "sign_extend.vh"
 import sign_extend::*;
 
-module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, current_pc);
+module control(clk, r_cache, r_mem, opcode, ir11, ben, control_signals, memory_initialized, current_pc);
     input clk;
-    input r;
+    input r_cache;
+    input r_mem;
     input [3:0] opcode;
     input ir11;
     input ben;
@@ -43,9 +44,12 @@ module control(clk, r, opcode, ir11, ben, control_signals, memory_initialized, c
     bit  [5:0] j;
     bit  [1:0] cond;
     bit ird;
+    bit r;
+
 
     assign run_bit = memory_initialized && (current_pc != 16'h0000);
-
+    assign r = r_cache || r_mem;
+    
     initial begin
         $readmemb("cs.mem", control_store);
         state_number = 18;

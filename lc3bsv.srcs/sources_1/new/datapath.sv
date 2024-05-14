@@ -23,10 +23,11 @@
 `include "sign_extend.vh"
 import sign_extend::*;
 
-module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r, start_pc, memory_initialized, pc, gate_en, load_en);
+module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11, ben, rw, r_cache, r_mem, start_pc, memory_initialized, pc, gate_en, load_en);
     input clk;
     input [25:0] control_signals;
-    input r;
+    input r_cache;
+    input r_mem;
     input [15:0] start_pc;
     input memory_initialized;
     input gate_en;

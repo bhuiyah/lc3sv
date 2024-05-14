@@ -22,7 +22,7 @@
 
 module DRAM(cs, we, clk, rw, address, memory_bus 
 `ifdef SIMULATE_CPU
-    , r, start_pc, memory_initialized
+    , r_mem, start_pc, memory_initialized
 `endif
     , cache_miss
 );
@@ -33,10 +33,11 @@ module DRAM(cs, we, clk, rw, address, memory_bus
     input rw;
     input [15:0] address;
     inout [15:0] memory_bus;
-    input cache_miss;
+    input cache_hit;
+    input mem_en;
 
     `ifdef SIMULATE_CPU
-        output reg r;
+        output reg r_mem;
         output reg [15:0] start_pc;
         output reg memory_initialized;
     `endif
@@ -100,7 +101,7 @@ module DRAM(cs, we, clk, rw, address, memory_bus
             r = 0;
         `endif
 
-        if(cache_miss) begin //if cache miss then access DRAM
+        if(!cache_hit && mem_en) begin //if cache miss then access DRAM
             if(cs) begin //cs = mio_en
                 if(cycle_count == 4) begin //5 cycles to read or write to DRAM
                     if(rw) begin //write
@@ -114,7 +115,7 @@ module DRAM(cs, we, clk, rw, address, memory_bus
                         data_out = DRAM[acc_addr];
 
                     `ifdef SIMULATE_CPU
-                        r = 1;
+                        r_mem = 1;
                     `endif
                         
                     cycle_count = 0; //reset cycle count after accessing DRAM
