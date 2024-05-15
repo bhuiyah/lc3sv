@@ -81,7 +81,7 @@ module datapath(clk, cs, we, address, memory_bus, control_signals, opcode, ir11,
     wire [15:0] addr1_out, addr2_out, lshf1_out, adder_out;
     wire [15:0] mdr_in_mioen_mux;
     wire [15:0] mioen_out;
-    wire [15:0] mdr_val_from_mem;
+    wire [31:0] mdr_val_from_mem;
     wire [1:0] we_out;
     wire initialized;
 
@@ -513,7 +513,9 @@ module we_logic(rw, mar0, data_size, we_out);
 
     always_comb begin
         if(rw) begin
+            // if address is even and access is byte OR if address is even and access is word
             we_out[0] = (!mar0 && !data_size) || (data_size && !mar0);
+            // if address is odd and access is byte OR if address is even and access is word
             we_out[1] = (mar0 && !data_size) || (data_size && !mar0);
         end
         else begin

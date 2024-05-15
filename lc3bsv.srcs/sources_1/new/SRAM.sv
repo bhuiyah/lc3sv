@@ -26,10 +26,10 @@
 `define valid_bit 35
 
 typedef enum {
-    IDLE, READ, READMISS, READMEM, READDATA, WRITE, WRITEHIT, WRITEMISS, WRITEMEM, WRITEDATA
+    IDLE, READ, READMISS, READMEM, READDATA, WRITE, WRITEHIT, WRITEMISS, WRITEMEM, WRITEDATA, UPDATECACHE
 } states;
 
-module SRAM(cs, we, clk, rw, address, memory_bus
+module SRAM(cs, we, clk, rw, address, memory_bus, cache_line_bus
     `ifdef SIMULATE_CPU
         , r_mem, r_cache
     `endif
@@ -41,13 +41,15 @@ module SRAM(cs, we, clk, rw, address, memory_bus
     input clk;
     input rw;
     input [15:0] address;
-    inout [31:0] memory_bus;
+    inout [15:0] memory_bus;
+    inout [31:0] cache_line_bus;
 
     `ifdef SIMULATE_CPU
         input r_mem;
         output reg r_cache;
     `endif
 
+    //cache signals
     output reg cache_hit;
     output reg mem_en;
 
@@ -66,89 +68,112 @@ module SRAM(cs, we, clk, rw, address, memory_bus
 
     reg [15:0] data_out;
     reg [14:0] acc_addr;
+    reg [31:0] cache_read_data;
 
+    //cache signals
     bit [1:0] hit_way;
+    bit dirty;
     bit empty;
     bit empty_way;
     bit [1:0] lru_way;
 
     integer i;
 
+    //state machine
     reg [3:0] state;
     reg [3:0] next_state;
 
-    assign memory_bus = ((cs == 0) || (we == 1) || !(cache_hit)) || (mem_en) ? 32'bZ : {16'bZ, data_out};
+    assign memory_bus = ((cs == 0) || (we == 1) || !(cache_hit)) || (mem_en) ? 16'bZ : data_out;
     assign acc_addr = address[15:1];
 
-
-    task automatic check_cache(output bit hit, output bit [1:0] hit_way);
+    task automatic check_cache(output bit hit, output bit dirty, output bit [1:0] way);
         hit = 0;
-        //4 hardware comparators
-        if(cache_way0[`addr_idx][46:36] == `addr_tag && cache_way0[`addr_idx][`valid_bit] && !cache_way0[`addr_idx][`dirty_bit]) begin
-            hit = 1;
-            hit_way = 0;
+        if(cache_way0[`addr_idx][46:36] == `addr_tag) begin
+            way = 0;
+            if(cache_way0[`addr_idx][`valid_bit]) begin
+                if(!cache_way0[`addr_idx][`dirty_bit]) begin
+                    hit = 1;
+                end
+                else begin
+                    dirty = 1;
+                end
+            end
         end
-        else if(cache_way1[`addr_idx][46:36] == `addr_tag && cache_way1[`addr_idx][`valid_bit] && !cache_way1[`addr_idx][`dirty_bit]) begin
-            hit = 1;
-            hit_way = 1;
+        else if(cache_way1[`addr_idx][46:36] == `addr_tag) begin
+            way = 1;
+            if(cache_way1[`addr_idx][`valid_bit]) begin
+                if(!cache_way1[`addr_idx][`dirty_bit]) begin
+                    hit = 1;
+                end
+                else begin
+                    dirty = 1;
+                end
+            end
         end
-        else if(cache_way2[`addr_idx][46:36] == `addr_tag && cache_way2[`addr_idx][`valid_bit] && !cache_way2[`addr_idx][`dirty_bit]) begin
-            hit = 1;
-            hit_way = 2;
+        else if(cache_way2[`addr_idx][46:36] == `addr_tag) begin
+            way = 2;
+            if(cache_way2[`addr_idx][`valid_bit]) begin
+                if(!cache_way2[`addr_idx][`dirty_bit]) begin
+                    hit = 1;
+                end
+                else begin
+                    dirty = 1;
+                end
+            end
         end
-        else if(cache_way3[`addr_idx][46:36] == `addr_tag && cache_way3[`addr_idx][`valid_bit] && !cache_way3[`addr_idx][`dirty_bit]) begin
-            hit = 1;
-            hit_way = 3;
+        else if(cache_way3[`addr_idx][46:36] == `addr_tag) begin
+            way = 3;
+            if(cache_way3[`addr_idx][`valid_bit]) begin
+                if(!cache_way3[`addr_idx][`dirty_bit]) begin
+                    hit = 1;
+                end
+                else begin
+                    dirty = 1;
+                end
+            end
+        end
+        else begin
+            hit = 0;
         end
     endtask
 
-    task automatic read_cache(input bit [1:0] hit_way, output reg [15:0] data_out);
+    task automatic read_cache(input bit [1:0] hit_way, output reg [15:0] cache_read_data);
         //only read data if cache hit
         if(hit_way == 0) begin
-            if(`addr_offset == 0 || `addr_offset == 1) begin
-                //lower half of data, 16 bits
-                data_out = cache_way0[`addr_idx][15:0];
-            end
-            else if(`addr_offset == 2 || `addr_offset == 3) begin
-                //upper half of data, 16 bits
-                data_out = cache_way0[`addr_idx][31:16];
-            end
+            cache_data_out = cache_way0[`addr_idx];
         end
         else if(hit_way == 1) begin
-            if(`addr_offset == 0 || `addr_offset == 1) begin
-                //lower half of data, 16 bits
-                data_out = cache_way1[`addr_idx][15:0];
-            end
-            else if(`addr_offset == 2 || `addr_offset == 3) begin
-                //upper half of data, 16 bits
-                data_out = cache_way1[`addr_idx][31:16];
-            end
+            cache_data_out = cache_way1[`addr_idx];
         end
         else if(hit_way == 2) begin
-            if(`addr_offset == 0 || `addr_offset == 1) begin
-                //lower half of data, 16 bits
-                data_out = cache_way2[`addr_idx][15:0];
-            end
-            else if(`addr_offset == 2 || `addr_offset == 3) begin
-                //upper half of data, 16 bits
-                data_out = cache_way2[`addr_idx][31:16];
-            end
+            cache_data_out = cache_way2[`addr_idx];
         end
         else if(hit_way == 3) begin
-            if(`addr_offset == 0 || `addr_offset == 1) begin
-                //lower half of data, 16 bits
-                data_out = cache_way3[`addr_idx][15:0];
-            end
-            else if(`addr_offset == 2 || `addr_offset == 3) begin
-                //upper half of data, 16 bits
-                data_out = cache_way3[`addr_idx][31:16];
-            end
+            cache_data_out = cache_way3[`addr_idx];
         end
     endtask
 
     task automatic cache_empty(output bit empty, output bit [1:0] way);
-        //check if cache is empty by checking tag bits
-
+        //check if cache is empty by checking valid bit
+        if(!cache_way0[`addr_idx][`valid_bit]) begin
+            empty = 1;
+            way = 0;
+        end
+        else if(!cache_way1[`addr_idx][`valid_bit]) begin
+            empty = 1;
+            way = 1;
+        end
+        else if(!cache_way2[`addr_idx][`valid_bit]) begin
+            empty = 1;
+            way = 2;
+        end
+        else if(!cache_way3[`addr_idx][`valid_bit]) begin
+            empty = 1;
+            way = 3;
+        end
+        else begin
+            empty = 0;
+        end
     endtask
 
     task automatic find_lru(output bit [1:0] lru_way);
@@ -192,10 +217,10 @@ module SRAM(cs, we, clk, rw, address, memory_bus
                 //wait until mio_en/cs is high meaning we want to access memory
                 if(cs && !cache_hit && !mem_en) begin
                     if(rw) begin
-                        next_state = READ;
+                        next_state = WRITE;
                     end
                     else begin
-                        next_state = WRITE;
+                        next_state = READ;
                     end
                 end
                 else begin
@@ -204,9 +229,16 @@ module SRAM(cs, we, clk, rw, address, memory_bus
             end
             READ: begin
                 //check if address is in cache
-                check_cache(cache_hit, hit_way);
+                check_cache(cache_hit, hit_way, dirty);
                 if(cache_hit) begin
-                    read_cache(hit_way, data_out);
+                    read_cache(hit_way, cache_read_data);
+                    //set cache read data to memory bus but need to find high word or low word
+                    if(acc_addr[0]) begin
+                        memory_bus = cache_read_data[15:0];
+                    end
+                    else begin
+                        memory_bus = cache_read_data[31:16];
+                    end
 
                     `ifdef SIMULATE_CPU
                         r_cache = 1;
@@ -225,6 +257,7 @@ module SRAM(cs, we, clk, rw, address, memory_bus
             READMEM: begin
                 //wait 5 cycles to read from memory
                 if(r_mem) begin //r_mem is 1 when data is ready from main memory
+                    mem_en = 0;
                     next_state = READDATA;
                 end
                 else begin //wait for data to be ready
@@ -293,6 +326,7 @@ module SRAM(cs, we, clk, rw, address, memory_bus
                         end
                     endcase
                 end
+                next_state = IDLE;
             end
             WRITE: begin
                 //check if address is in cache
