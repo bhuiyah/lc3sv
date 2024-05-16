@@ -24,7 +24,7 @@ module DRAM(cs, we, clk, rw, address, cache_line_bus
 `ifdef SIMULATE_CPU
     , r_mem, start_pc, memory_initialized
 `endif
-    , cache_hit, mem_en
+    , cache_hit, mem_en, evict, cache_line_address
 );
 
     input cs;
@@ -35,6 +35,8 @@ module DRAM(cs, we, clk, rw, address, cache_line_bus
     input cache_hit;
     input mem_en;
     inout [31:0] cache_line_bus;
+    input evict;
+    input [15:0] cache_line_address;
 
     `ifdef SIMULATE_CPU
         output reg r_mem;
@@ -83,7 +85,7 @@ module DRAM(cs, we, clk, rw, address, cache_line_bus
         endtask
     `endif 
     
-    assign cache_line_bus = ((cs == 0) || (we == 1) || (!cache_miss)) ? 32'bZ : data_out;
+    assign cache_line_bus = ((cs == 0) || (we != 0) || (!cache_hit) || evicted) ? 32'bZ : data_out;
     assign acc_addr_read = {address[15:2], 2'b00}; //will be used to read 4 bytes from DRAM
     assign acc_addr_write = {address[15:1], 1'b0}; //will be used to write 2 bytes to DRAM
 
@@ -103,7 +105,7 @@ module DRAM(cs, we, clk, rw, address, cache_line_bus
             r = 0;
         `endif
 
-        if(!cache_hit && mem_en) begin //if cache miss then access DRAM
+        if((!cache_hit && mem_en) || (mem_en && evict)) begin //if cache miss then access DRAM
             if(cs) begin //cs = mio_en
                 if(cycle_count == 4) begin //5 cycles to read or write to DRAM
                     if(rw) begin //write
@@ -112,6 +114,13 @@ module DRAM(cs, we, clk, rw, address, cache_line_bus
 
                         if(we[1])
                             DRAM[acc_addr_write][15:8] = memory_bus[15:8];
+                    end
+                    else if(evict) begin
+                        //write evicted string to DRAM
+                        DRAM[cache_line_address][7:0] = cache_line_bus[7:0];
+                        DRAM[cache_line_address][15:8] = cache_line_bus[15:8];
+                        DRAM[cache_line_address + 1][7:0] = cache_line_bus[23:16];
+                        DRAM[cache_line_address + 1][15:8] = cache_line_bus[31:24];
                     end
                     else begin //read 4 bytes
                         data_out = {DRAM[acc_addr_read + 1], DRAM[acc_addr_read]}; 
